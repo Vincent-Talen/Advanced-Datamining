@@ -1,0 +1,8 @@
+# JetBrains
+.idea/
+
+# Jupyter
+.ipynb_checkpoints
+
+# MacOS
+.DS_Store
