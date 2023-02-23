@@ -3,5 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - matplotlib=3.7
+  - notebook=6.5
+  - pandas=1.5
   - python=3.11
-  - notebook
+  - scikit-learn=1.2
