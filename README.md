@@ -86,6 +86,12 @@ In the notebook you can run all the code chunks, or just a selection until a cer
 But make sure that if for example you want to run the third chunk you also run the two chunks before that! 
 Since it might use object create before the actual chunk you want to run.
 
+### Converting notebook to PDF
+To convert the Jupyter Notebook to pdf simply use the following command:
+```bash
+jupyter nbconvert --to webpdf --allow-chromium-download path/to/notebook.ipynb 
+```
+
 
 ## Useful links
 * [Conda documentation](https://docs.conda.io/projects/conda/en/latest)
