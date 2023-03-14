@@ -152,8 +152,9 @@ class Neuron:
             alpha: Learning rate
         """
         for x, y in zip(xs, ys):
-            yhat = self.predict([x])[0]
-            slope = derivative(self.loss)(yhat, y) * derivative(self.activation)(yhat)
+            pre_activation = self.bias + sum(wi * xi for wi, xi in zip(self.weights, x))
+            yhat = self.activation(pre_activation)
+            slope = derivative(self.loss)(yhat, y) * derivative(self.activation)(pre_activation)
             self.bias -= alpha * slope
             self.weights = [wi - alpha * slope * xi for wi, xi in zip(self.weights, x)]
 
