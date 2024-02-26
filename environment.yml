@@ -6,5 +6,6 @@ dependencies:
   - nbconvert-webpdf=7.2
   - notebook=6.5
   - pandas=1.5
-  - python=3.11
+  - python=3.10
   - scikit-learn=1.2
+  - tensorflow=2.11
