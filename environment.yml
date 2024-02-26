@@ -6,6 +6,10 @@ dependencies:
   - nbconvert-webpdf=7.7
   - notebook=7.1
   - pandas=2.2
+  - pip=24.0
   - python=3.11
   - scikit-learn=1.4
   - tensorflow=2.15
+  - pip:
+    - nbconvert[webpdf]
+    - poetry

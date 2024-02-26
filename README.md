@@ -70,6 +70,17 @@ mamba env create
 ```
 This will name the environment `advanced-datamining`, if desired it can be given another name by adding `--name your-desired-name`.
 
+### Install `vlearning` python package
+All the Python code written for this course is located in the `vlearning` package.
+It is thus required to install this package in the environment to be able to run the Jupyter Notebooks for the chapters or the final assignment.
+First we'll activate the just-created environment and after that we'll install the package using [Poetry](https://python-poetry.org/), which was specified in the environment.yml so it should already be installed.
+Use the following commands to activate the environment and install the package:
+```bash
+mamba activate advanced-datamining
+cd vlearning
+poetry install
+```
+
 
 ## Usage
 To run a model open the terminal with the working directory of the pipeline you want to run.  
