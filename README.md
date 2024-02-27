@@ -23,6 +23,12 @@ The course is graded by handing in a final assignment and by doing an oral exami
 The final assignment consists out of two parts, the first part is creating your final neural network Python module 
 and the second part is to use that module to create a model for a real dataset.
 
+### My own spin on the course; vlearning package
+The way every chapter had the same `data.py` module and a different version of the `model.py` module,
+was not to my liking, because it was not very organised with a LOT of duplicate code.
+This is why I decided to create a Python package instead, that will contain all the code for the models nicely separated in different modules.
+I decided to name this package `vlearning`, which I found appropriate and funny to sort of include my name in it, since it stands for "Vincent's Learning".
+
 
 ## Repository file structure
 ```
@@ -41,8 +47,12 @@ Advanced-Datamining
 │   └── *
 ├── Chapter05
 │   └── *
-└── Final-Assignment
-    └── *
+├── Final-Assignment
+│   └── *
+└── vlearning
+    ├── pyproject.toml
+    └── vlearning
+        └── *
 ```
 
 
