@@ -1,6 +1,8 @@
 from math import e as math_e, tanh as math_tanh
 from numpy import sign as np_sign
 
+__all__ = ["linear", "sign", "tanh"]
+
 
 def linear(a: float) -> float:
     """

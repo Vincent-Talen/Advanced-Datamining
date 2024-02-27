@@ -45,10 +45,10 @@ class Perceptron:
         """
         model_updated = False
         for x, y in zip(xs, ys):
-            # get prediction yhat
+            # Get predicted value (yhat)
             yhat = self.predict([x])[0]
 
-            # update bias and weights if error is not 0
+            # Update bias and weights if the error is not 0
             if error := yhat - y:
                 model_updated = True
                 self.bias -= error
