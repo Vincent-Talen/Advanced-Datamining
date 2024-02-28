@@ -2,51 +2,146 @@ from collections import Counter
 from copy import deepcopy
 
 
-class Layer():
+class Layer:
+    """
+    Base implementation of a layer for in a neural network.
 
-    layercounter = Counter()
+    Class Attributes:
+        counter (Counter): A counter to keep track of the number of each type of layer.
 
-    def __init__(self, outputs, *, name=None, next=None):
-        Layer.layercounter[type(self)] += 1
-        if name is None:
-            name = f'{type(self).__name__}_{Layer.layercounter[type(self)]}'
-        self.inputs = 0
-        self.outputs = outputs
-        self.name = name
-        self.next = next
+    Instance Attributes:
+        inputs (int): The number of inputs to the layer.
+        outputs (int): The number of outputs from the layer.
+        name (str): The name of the layer.
+        next_layer (Layer): The next layer in the network.
+    """
+    counter: Counter = Counter()
 
-    def __add__(self, next):
+    def __init__(self, outputs: int, *, name: str = None, next_layer=None):
+        """
+        Parameters:
+            outputs (int): The number of outputs from the layer.
+            name (str, optional): The name of the layer. Default = None.
+            next_layer (Layer, optional): The next layer in the network. Default = None.
+        """
+        Layer.counter[type(self)] += 1
+        self.inputs: int = 0
+        self.outputs: int = outputs
+        self.name: str = name or f"{type(self).__name__}_{Layer.counter[type(self)]}"
+        self.next_layer = next_layer
+
+    def __add__(self, new_layer):
+        """
+        Overloads the '+' operator to add a new layer to the network.
+        NOTE: The instances of the previous layers and the new layer are
+        not used as references, but are newly instantiated as deep copies.
+
+        Parameters:
+            new_layer (Layer): The new layer to be added after the current layer.
+
+        Returns:
+            Layer: An updated network with the new layer added.
+        """
         result = deepcopy(self)
-        result.add(deepcopy(next))
+        result.add(deepcopy(new_layer))
         return result
 
-    def __repr__(self):
-        text = f'Layer(inputs={self.inputs}, outputs={self.outputs}, name={repr(self.name)})'
-        if self.next is not None:
-            text += ' + ' + repr(self.next)
-        return text
+    def __getitem__(self, index: [int | str]):
+        """
+        Overloads the '[]' operator to get a layer by its index or name.
 
-    def __getitem__(self, index):
+        Parameters:
+            index (int | str): The index or name of the layer.
+
+        Returns:
+            Layer: The layer at the given index or with the given name.
+
+        Raises:
+            IndexError: If the index is out of range.
+            KeyError: If the name does not exist.
+            TypeError: If the index is not an integer or string.
+        """
         if index == 0 or index == self.name:
             return self
         if isinstance(index, int):
-            if self.next is None:
-                raise IndexError('Layer index out of range')
-            return self.next[index - 1]
+            if self.next_layer is None:
+                raise IndexError("Layer index out of range")
+            return self.next_layer[index - 1]
         if isinstance(index, str):
-            if self.next is None:
+            if self.next_layer is None:
                 raise KeyError(index)
-            return self.next[index]
+            return self.next_layer[index]
         raise TypeError(
-            f'Layer indices must be integers or strings, not {type(index).__name__}'
+            f"Layer indices must be integers or strings, not {type(index).__name__}"
         )
 
-    def add(self, next):
-        if self.next is None:
-            self.next = next
-            next.set_inputs(self.outputs)
-        else:
-            self.next.add(next)
+    def __iadd__(self, new_layer):
+        """
+        Overloads the '+=' operator to add a new layer to the network in-place.
 
-    def set_inputs(self, inputs):
+        Parameters:
+            new_layer (Layer): The new layer to be added after the current layer.
+
+        Returns:
+            Layer: The updated network with the new layer added.
+        """
+        self.add(new_layer)
+        return self
+
+    def __iter__(self):
+        """
+        Makes the Layer instances iterable.
+
+        Yields:
+            Layer: The current layer in the network.
+        """
+        current_layer = self
+        while current_layer is not None:
+            yield current_layer
+            current_layer = current_layer.next_layer
+
+    def __len__(self):
+        """
+        Returns the number of layers in the network.
+
+        Returns:
+            int: The number of layers.
+        """
+        count = 1
+        current_layer = self.next_layer
+        while current_layer is not None:
+            count += 1
+            current_layer = current_layer.next_layer
+        return count
+
+    def __repr__(self):
+        text = (
+            "Layer("
+            f"inputs={self.inputs}, outputs={self.outputs}, name={repr(self.name)}"
+            ")"
+        )
+        if self.next_layer is not None:
+            text += f" + {repr(self.next_layer)}"
+        return text
+
+    def add(self, new_layer):
+        """
+        Adds a new layer at the end of the network.
+
+        Parameters:
+            new_layer (Layer): The new layer to be added.
+        """
+        if self.next_layer is None:
+            self.next_layer = new_layer
+            new_layer.set_inputs(self.outputs)
+        else:
+            self.next_layer.add(new_layer)
+
+    def set_inputs(self, inputs: int):
+        """
+        Sets the number of inputs for the layer.
+
+        Parameters:
+            inputs (int): The number of inputs.
+        """
         self.inputs = inputs
