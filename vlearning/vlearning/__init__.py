@@ -21,4 +21,6 @@ __all__ = [
     # Modules
     "activation_functions",
     "loss_functions",
+    # Subpackages
+    "layers",
 ]
