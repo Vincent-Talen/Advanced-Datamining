@@ -4,30 +4,28 @@ from copy import deepcopy
 
 class Layer:
     """
-    Base implementation of a layer for in a neural network.
+    Base implementation of a layer for a neural network, only defines layer structure.
 
-    Class Attributes:
-        counter (Counter): A counter to keep track of the number of each type of layer.
-
-    Instance Attributes:
-        inputs (int): The number of inputs to the layer.
-        outputs (int): The number of outputs from the layer.
+    Attributes:
+        num_inputs (int): The number of inputs to the layer.
+        num_outputs (int): The number of outputs from the layer.
         name (str): The name of the layer.
         next_layer (Layer): The next layer in the network.
     """
-    counter: Counter = Counter()
+    _counter: Counter = Counter()
+    """Counter: Counter keeping track of the number of instances of each layer class."""
 
-    def __init__(self, outputs: int, *, name: str = None, next_layer=None):
+    def __init__(self, num_outputs: int, *, name: str = None, next_layer=None):
         """
         Parameters:
-            outputs (int): The number of outputs from the layer.
+            num_outputs (int): The number of outputs from the layer.
             name (str, optional): The name of the layer. Default = None.
             next_layer (Layer, optional): The next layer in the network. Default = None.
         """
-        Layer.counter[type(self)] += 1
-        self.inputs: int = 0
-        self.outputs: int = outputs
-        self.name: str = name or f"{type(self).__name__}_{Layer.counter[type(self)]}"
+        Layer._counter[type(self)] += 1
+        self.num_inputs: int = 0
+        self.num_outputs: int = num_outputs
+        self.name: str = name or f"{type(self).__name__}_{Layer._counter[type(self)]}"
         self.next_layer = next_layer
 
     def __add__(self, new_layer):
@@ -49,6 +47,8 @@ class Layer:
     def __getitem__(self, index: [int | str]):
         """
         Overloads the '[]' operator to get a layer by its index or name.
+        Searches for a layer matching the index by recursively
+        calling this method on layers down the chain.
 
         Parameters:
             index (int | str): The index or name of the layer.
@@ -116,13 +116,24 @@ class Layer:
 
     def __repr__(self):
         text = (
-            "Layer("
-            f"inputs={self.inputs}, outputs={self.outputs}, name={repr(self.name)}"
+            f"{type(self).__name__}("
+            f"num_inputs={self.num_inputs}, "
+            f"num_outputs={self.num_outputs}, "
+            f"name={repr(self.name)}"
             ")"
         )
         if self.next_layer is not None:
             text += f" + {repr(self.next_layer)}"
         return text
+
+    def _set_inputs(self, num_inputs: int):
+        """
+        Sets the number of inputs for the layer.
+
+        Parameters:
+            num_inputs (int): The number of inputs.
+        """
+        self.num_inputs = num_inputs
 
     def add(self, new_layer):
         """
@@ -133,15 +144,6 @@ class Layer:
         """
         if self.next_layer is None:
             self.next_layer = new_layer
-            new_layer.set_inputs(self.outputs)
+            new_layer._set_inputs(self.num_outputs)
         else:
             self.next_layer.add(new_layer)
-
-    def set_inputs(self, inputs: int):
-        """
-        Sets the number of inputs for the layer.
-
-        Parameters:
-            inputs (int): The number of inputs.
-        """
-        self.inputs = inputs
