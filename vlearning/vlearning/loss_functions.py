@@ -1,9 +1,16 @@
+"""Module defining various loss functions.
+
+Available loss functions:
+    - mean_squared_error
+    - mean_absolute_error
+    - hinge
+"""
+
 __all__ = ["mean_squared_error", "mean_absolute_error", "hinge"]
 
 
 def mean_squared_error(yhat: float, y: float) -> float:
-    """
-    Mean Squared Error Loss-function
+    """Mean Squared Error Loss-function
 
     Args:
         yhat: predicted classification of the instance
@@ -16,8 +23,7 @@ def mean_squared_error(yhat: float, y: float) -> float:
 
 
 def mean_absolute_error(yhat: float, y: float) -> float:
-    """
-    Mean Absolute Error Loss-function
+    """Mean Absolute Error Loss-function
 
     Args:
         yhat: predicted classification of the instance
@@ -30,8 +36,7 @@ def mean_absolute_error(yhat: float, y: float) -> float:
 
 
 def hinge(yhat: float, y: float) -> float:
-    """
-    Hinge Loss-function
+    """Hinge Loss-function
 
     Args:
         yhat: predicted classification of the instance

@@ -1,3 +1,10 @@
+"""Module defining various activation functions.
+
+Available activation functions:
+    - linear
+    - sign
+    - tanh
+"""
 from math import e as math_e, tanh as math_tanh
 from numpy import sign as np_sign
 
@@ -5,8 +12,7 @@ __all__ = ["linear", "sign", "tanh"]
 
 
 def linear(a: float) -> float:
-    """
-    Linear "Identity" Activation Function
+    """Linear "Identity" Activation Function
 
     Args:
         a: pre-activation value
@@ -18,8 +24,7 @@ def linear(a: float) -> float:
 
 
 def sign(a: float) -> float:
-    """
-    Sign, or Signum, Activation Function
+    """Sign (a.k.a. Signum) Activation Function
 
     Args:
         a: pre-activation value
@@ -37,8 +42,7 @@ def sign(a: float) -> float:
 
 
 def tanh(a: float) -> float:
-    """
-    Hyperbolic Tangent Activation Function
+    """Hyperbolic Tangent Activation Function
 
     Args:
         a: pre-activation value

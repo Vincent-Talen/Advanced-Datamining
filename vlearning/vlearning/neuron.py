@@ -1,4 +1,13 @@
-from typing import Callable
+"""This module contains the implementation of a generalized model of a neuron.
+
+Typical usage example:
+
+    my_neuron = Neuron(dim=2)
+    my_neuron.fit(xs, ys)
+"""
+from collections.abc import Callable
+
+from overrides import override
 
 from vlearning import derivative
 from vlearning.activation_functions import linear
@@ -7,12 +16,19 @@ from vlearning.loss_functions import mean_squared_error
 
 class Neuron:
     """
-    The Neuron class is a generalized model that computes an activation value from
-    inputs that it receives. It achieves this by weighting the inputs, adding bias,
-    using an activation function and a loss functions.
+    A generalized model that computes an activation value from inputs that it receives.
+    This is achieved by weighting the inputs, adding bias and using an activation-
+    and a loss function.
 
-    It trains by iterating over data and updating its weights and bias accordingly
-    through the use of gradient descent, which is a method to minimize loss.
+    It fits/trains by iterating over the input data and then updating its weights and
+    bias accordingly by the use of gradient descent, which is a method to minimize loss.
+
+    Attributes:
+        dim (int): Amount of input features
+        activation (Callable): Activation function
+        loss (Callable): Loss function
+        bias (float): Bias value
+        weights (list[float]): List of weights
     """
     def __init__(
         self,
@@ -20,13 +36,19 @@ class Neuron:
         activation: Callable = linear,
         loss: Callable = mean_squared_error
     ):
-        self.dim = dim
-        self.activation = activation
-        self.loss = loss
-        self.bias = 0.0
-        self.weights = [0.0 for _ in range(dim)]
+        """
+        Args:
+            dim: Amount of input features
+            activation: Activation function
+            loss: Loss function
+        """
+        self.dim: int = dim
+        self.activation: Callable = activation
+        self.loss: Callable = loss
+        self.bias: float = 0.0
+        self.weights: list[float] = [0.0 for _ in range(dim)]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "Neuron("
             f"dim={self.dim}, "
@@ -35,9 +57,8 @@ class Neuron:
             ")"
         )
 
-    def predict(self, xs: list) -> list:
-        """
-        Calculates prediction value for each instance in the list of instances given.
+    def predict(self, xs: list) -> list[float]:
+        """Calculates the predicted value for every instance of the input list.
 
         Args:
             xs: List of input data/instances
@@ -53,32 +74,39 @@ class Neuron:
         ]
 
     def partial_fit(self, xs: list, ys: list, *, alpha: int = 0.001) -> None:
-        """
-        Update/fit the model with a single iteration over the given data.
+        """Fit/train the neuron with a single iteration over the given data.
 
         Args:
             xs: List of input data/instances
             ys: List of target values
+
+        Keyword Args:
             alpha: Learning rate
         """
         for x, y in zip(xs, ys):
+            # Calculate the pre-activation and the post-activation (yhat) values
             pre_activation = self.bias + sum(wi * xi for wi, xi in zip(self.weights, x))
             yhat = self.activation(pre_activation)
-            loss_derivative = derivative(self.loss)
-            activation_derivative = derivative(self.activation)
-            slope = loss_derivative(yhat, y) * activation_derivative(pre_activation)
+
+            # Get the derivative functions and calculate the slope
+            loss_prime: Callable = derivative(self.loss)
+            activation_prime: Callable = derivative(self.activation)
+            slope = loss_prime(yhat, y) * activation_prime(pre_activation)
+
+            # Update the bias and weights
             self.bias -= alpha * slope
             self.weights = [wi - alpha * slope * xi for wi, xi in zip(self.weights, x)]
 
     def fit(
         self, xs: list, ys: list, *, alpha: int = 0.001, epochs: int = 1000
     ) -> None:
-        """
-        Update/fit the model for <epochs> amount of iterations over the given data.
+        """Fit/train the neuron for <epochs> amount of iterations over the given data.
 
         Args:
             xs: List of input instances
             ys: List of target values
+
+        Keyword Args:
             alpha: Learning rate
             epochs: Amount of iterations/epochs the model should perform for training
         """

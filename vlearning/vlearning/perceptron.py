@@ -14,7 +14,7 @@ class Perceptron:
         self.weights = [0.0 for _ in range(dim)]
         self.fitted = False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Perceptron(dim={self.dim})"
 
     def predict(self, xs: list) -> list:
