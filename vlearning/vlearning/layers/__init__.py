@@ -33,7 +33,9 @@ Typical usage example:
     y_hats = my_network.predict(xs)
 """
 from .layer import Layer
+from .inputlayer import InputLayer
 
 __all__ = [
     "Layer",
+    "InputLayer",
 ]

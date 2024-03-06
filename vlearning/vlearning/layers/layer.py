@@ -1,9 +1,9 @@
 """This module contains the base implementation of a layer for a neural network.
 
-Typical usage example:
-
-    network = Layer(3, name="Input") + Layer(2, name="Hidden") + Layer(1, name="Output")
-    print(network)
+The Layer class is not meant to be actually used as a layer in a network, but
+is instead meant to be subclassed by other layer classes. It defines the basic
+structure of a layer and provides methods for adding layers to a network and
+accessing layers by index or name.
 """
 from __future__ import annotations
 
@@ -13,6 +13,11 @@ from copy import deepcopy
 
 class Layer:
     """Base implementation of a neural network layer only defining network structure.
+
+    The Layer class is not meant to be actually used as a layer in a network, but
+    is instead meant to be subclassed by other layer classes. It defines the basic
+    structure of a layer and provides methods for adding layers to a network and
+    accessing layers by index or name.
 
     Attributes:
         num_inputs (int): The number of inputs to the layer.
