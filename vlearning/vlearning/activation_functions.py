@@ -6,7 +6,6 @@ Available activation functions:
     - tanh
 """
 from math import e as math_e, tanh as math_tanh
-from numpy import sign as np_sign
 
 __all__ = ["linear", "sign", "tanh"]
 
@@ -32,13 +31,12 @@ def sign(a: float) -> float:
     Returns:
         post-activation value
     """
-    # if a > 0.0:
-    #     return 1.0
-    # elif a < 0.0:
-    #     return -1.0
-    # else:
-    #     return 0.0
-    return np_sign(a)
+    if a > 0.0:
+        return 1.0
+    elif a < 0.0:
+        return -1.0
+    else:
+        return 0.0
 
 
 def tanh(a: float) -> float:
