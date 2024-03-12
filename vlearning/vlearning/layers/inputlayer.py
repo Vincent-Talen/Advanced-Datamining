@@ -10,14 +10,9 @@ from . import Layer
 
 
 class InputLayer(Layer):
-    @override
-    def __repr__(self) -> str:
-        text = f"InputLayer(num_outputs={self.num_outputs}, name={repr(self.name)})"
-        if self.next_layer is not None:
-            text += f" + {repr(self.next_layer)}"
-        return text
-
+    """The first layer in a neural network, thus does not have any inputs.
+    """
     @override
     def _set_inputs(self, num_inputs: int) -> None:
-        raise TypeError("An InputLayer does not have, or accept, inputs.")
+        raise TypeError("An InputLayer does not have, nor accept, inputs.")
 

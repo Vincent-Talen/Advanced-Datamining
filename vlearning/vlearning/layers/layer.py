@@ -135,13 +135,12 @@ class Layer:
     def __repr__(self) -> str:
         text = (
             f"{type(self).__name__}("
-            f"num_inputs={self.num_inputs}, "
             f"num_outputs={self.num_outputs}, "
-            f"name={repr(self.name)}"
+            f"name='{self.name}'"
             ")"
         )
         if self.next_layer is not None:
-            text += f" + {repr(self.next_layer)}"
+            text += f" + {self.next_layer!r}"
         return text
 
     def _set_inputs(self, num_inputs: int) -> None:
