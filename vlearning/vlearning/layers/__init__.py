@@ -35,9 +35,11 @@ Typical usage example:
 from .layer import Layer
 from .inputlayer import InputLayer
 from .denselayer import DenseLayer
+from .activationlayer import ActivationLayer
 
 __all__ = [
     "Layer",
     "InputLayer",
     "DenseLayer",
+    "ActivationLayer",
 ]
