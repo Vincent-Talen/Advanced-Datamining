@@ -57,8 +57,11 @@ class ActivationLayer(Layer):
     @override
     def __repr__(self) -> str:
         text = (
-            super().__repr__().rstrip(")") +
-            f", activation='{self.activation.__name__}')"
+            f"{type(self).__name__}("
+            f"num_outputs={self.num_outputs}, "
+            f"name='{self.name}', "
+            f"activation='{self.activation.__name__}'"
+            ")"
         )
         if self.next_layer is not None:
             text += f" + {self.next_layer!r}"
