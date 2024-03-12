@@ -56,3 +56,11 @@ Others are more significant and changed the API, requiring changes to the code w
 
 - **The `layercounter` Layer class attribute was made hidden and renamed to `_counter`.**  
   _Unintended usage should be prevented this way by making it a hidden attribute and renaming it solved the bad naming practise of concatenating two words._
+
+
+- **Made the `set_inputs` method hidden and thus renamed it to `_set_inputs`.**
+  _It is only ever used internally by the `add()` method, setting the number of outputs of the previous layer as the number of inputs for the current layer._
+
+
+- **For the DenseLayer class the `bias` class attribute was renamed to `biases`.**  
+  _Indicating that the attribute is in fact, plural, and that it contains a list with multiple values._
