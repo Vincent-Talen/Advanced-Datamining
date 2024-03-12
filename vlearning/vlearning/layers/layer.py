@@ -19,6 +19,11 @@ class Layer:
     structure of a layer and provides methods for adding layers to a network and
     accessing layers by index or name.
 
+    Because in some earlier notebooks of the course the Layer class is instantiated,
+    it can not be made an abstract class that inherits from the `abc.ABC` class.
+    In turn the `@abc.abstractmethod` decorator is not used for methods intended to be
+    abstract, but the methods are instead implemented to raise a `NotImplementedError`.
+
     Attributes:
         num_inputs (int): The number of inputs to the layer.
         num_outputs (int): The number of outputs from the layer.
@@ -64,6 +69,24 @@ class Layer:
         result = deepcopy(self)
         result.add(deepcopy(new_layer))
         return result
+
+    def __call__(self, xs: list[list[float]]) -> list[list[float]]:
+        """Makes layer instances callable, used during forward-propagation.
+
+        This method is meant to be overridden by subclasses and each subclass
+        needs to implement its own version of this method.
+
+        When an instance is called it performs its part of the calculations for
+        forward-propagation and then calls the next layer in the network with the
+        results of its calculations.
+
+        Args:
+            xs: The data the layer should predict values for.
+
+        Returns:
+            The predicted values.
+        """
+        raise NotImplementedError("Abstract __call__ method")
 
     def __getitem__(self, index: [int | str]) -> Layer:
         """Implements the '[]' operator to get a layer by its index or name.
