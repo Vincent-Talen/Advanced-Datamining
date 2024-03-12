@@ -30,7 +30,7 @@ class Layer:
 
     def __init__(
         self,
-        num_outputs: int,
+        num_outputs: int | None,
         *,
         name: str | None = None,
         next_layer: Layer | None = None
@@ -44,8 +44,8 @@ class Layer:
             next_layer: The next layer in the network.
         """
         Layer._counter[type(self)] += 1
-        self.num_inputs: int = 0
-        self.num_outputs: int = num_outputs
+        self.num_inputs: int | None = None
+        self.num_outputs: int | None = num_outputs
         self.name: str = name or f"{type(self).__name__}_{Layer._counter[type(self)]}"
         self.next_layer: Layer | None = next_layer
 

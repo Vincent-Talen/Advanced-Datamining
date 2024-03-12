@@ -36,10 +36,12 @@ from .layer import Layer
 from .inputlayer import InputLayer
 from .denselayer import DenseLayer
 from .activationlayer import ActivationLayer
+from .losslayer import LossLayer
 
 __all__ = [
     "Layer",
     "InputLayer",
     "DenseLayer",
     "ActivationLayer",
+    "LossLayer",
 ]
