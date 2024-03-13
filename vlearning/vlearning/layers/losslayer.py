@@ -47,9 +47,17 @@ class LossLayer(Layer):
         self.loss: Callable = loss
 
     @override
-    def __call__(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
+    def __call__(
+        self, xs: list[DataInstanceValues], ys: list[float] = None
+    ) -> tuple[list[DataInstanceValues], list[float] | None]:
         y_hats: list[DataInstanceValues] = xs
-        return y_hats
+        losses = None
+        if ys:
+            losses = [
+                sum(self.loss(y_hat[o], y[o]) for o in range(self.num_inputs))
+                for y_hat, y in zip(y_hats, ys)
+            ]
+        return y_hats, losses
 
     @override
     def __repr__(self) -> str:

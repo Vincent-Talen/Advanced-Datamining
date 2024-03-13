@@ -57,7 +57,9 @@ class ActivationLayer(Layer):
         self.activation: Callable = activation
 
     @override
-    def __call__(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
+    def __call__(
+        self, xs: list[DataInstanceValues], ys: list[float] = None
+    ) -> tuple[list[DataInstanceValues], list[float] | None]:
         hh: list[DataInstanceValues] = []
         for x in xs:
             h: DataInstanceValues = [
@@ -65,8 +67,8 @@ class ActivationLayer(Layer):
                 for o in range(self.num_outputs)
             ]
             hh.append(h)
-        y_hats: list[DataInstanceValues] = self.next_layer(hh)
-        return y_hats
+        y_hats, losses = self.next_layer(hh, ys)
+        return y_hats, losses
 
     @override
     def __repr__(self) -> str:

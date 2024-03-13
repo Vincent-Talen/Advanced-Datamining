@@ -73,7 +73,9 @@ class Layer:
         result.add(deepcopy(new_layer))
         return result
 
-    def __call__(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
+    def __call__(
+        self, xs: list[DataInstanceValues], ys: list[float] = None
+    ) -> tuple[list[DataInstanceValues], list[float] | None]:
         """Makes layer instances callable, used during forward-propagation.
 
         This method is meant to be overridden by subclasses and each subclass
@@ -81,13 +83,17 @@ class Layer:
 
         When an instance is called it performs its part of the calculations for
         forward-propagation and then calls the next layer in the network with the
-        results of its calculations.
+        results of its calculations. Every instance also passes the `ys` argument
+        to the next layer until the LossLayer is reached, which then returns the
+        loss of the network.
 
         Args:
             xs: The data the layer should predict values for.
+            ys: The true values of the data.
 
         Returns:
-            The predicted values.
+            The predicted values of the network.
+            If `ys` is not `None`, the loss of the network is also returned.
         """
         raise NotImplementedError("Abstract __call__ method")
 

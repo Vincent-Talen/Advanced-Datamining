@@ -27,9 +27,11 @@ class InputLayer(Layer):
         next_layer (Layer | None): The next layer in the network.
     """
     @override
-    def __call__(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
-        y_hats: list[DataInstanceValues] = self.next_layer(xs)
-        return y_hats
+    def __call__(
+        self, xs: list[DataInstanceValues], ys: list[float] = None
+    ) -> tuple[list[DataInstanceValues], list[float] | None]:
+        y_hats, losses = self.next_layer(xs, ys)
+        return y_hats, losses
 
     @override
     def _set_inputs(self, num_inputs: int) -> None:
@@ -47,5 +49,18 @@ class InputLayer(Layer):
         Returns:
             The predicted values for the given dataset.
         """
-        y_hats = self(xs)
+        y_hats, _ = self(xs)
         return y_hats
+
+    def evaluate(self, xs: list[DataInstanceValues], ys: list[float]) -> float:
+        """Get the mean loss of the network for the instances of the given dataset.
+
+        Args:
+            xs: The data the layer should predict values for.
+            ys: The true values of the data.
+
+        Returns:
+            The mean loss of the network for the instances of the given dataset.
+        """
+        _, losses = self(xs, ys)
+        return sum(losses) / len(losses)

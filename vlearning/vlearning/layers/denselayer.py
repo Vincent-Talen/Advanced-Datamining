@@ -62,7 +62,9 @@ class DenseLayer(Layer):
         self.weights: list[list[float]] | None = None
 
     @override
-    def __call__(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
+    def __call__(
+        self, xs: list[DataInstanceValues], ys: list[float] = None
+    ) -> tuple[list[DataInstanceValues], list[float] | None]:
         aa: list[DataInstanceValues] = []
         for x in xs:
             a: DataInstanceValues = []
@@ -72,8 +74,8 @@ class DenseLayer(Layer):
                     self.biases[o] + sum(wi * xi for wi, xi in zip(self.weights[o], x))
                 )
             aa.append(a)
-        y_hats: list[DataInstanceValues] = self.next_layer(aa)
-        return y_hats
+        y_hats, losses = self.next_layer(aa, ys)
+        return y_hats, losses
 
     @override
     def _set_inputs(self, num_inputs: int) -> None:
