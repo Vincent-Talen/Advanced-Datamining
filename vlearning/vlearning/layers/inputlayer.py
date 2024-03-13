@@ -23,6 +23,24 @@ class InputLayer(Layer):
         next_layer (Layer | None): The next layer in the network.
     """
     @override
+    def __call__(self, xs: list[list[float]]) -> list[list[float]]:
+        return self.next_layer(xs)
+
+    @override
     def _set_inputs(self, num_inputs: int) -> None:
         raise TypeError("An InputLayer does not have, nor accept, inputs.")
 
+    def predict(self, xs: list[list[float]]) -> list[list[float]]:
+        """Get the predicted values for the given dataset.
+
+        This method is an accessibility/ease-of-use wrapper that simply calls
+        the instance itself, returning the predicted values of the network.
+
+        Args:
+            xs: The data the layer should predict values for.
+
+        Returns:
+            The predicted values for the given dataset.
+        """
+        y_hats = self(xs)
+        return y_hats
