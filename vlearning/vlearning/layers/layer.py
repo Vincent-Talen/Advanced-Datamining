@@ -74,26 +74,30 @@ class Layer:
         return result
 
     def __call__(
-        self, xs: list[DataInstanceValues], ys: list[float] = None
-    ) -> tuple[list[DataInstanceValues], list[float] | None]:
+        self, xs: list[DataInstanceValues], ys: list[float] = None, alpha: float = None
+    ) -> tuple[list[DataInstanceValues], list[float] | None, list[float] | None]:
         """Makes layer instances callable, used during forward-propagation.
 
         This method is meant to be overridden by subclasses and each subclass
         needs to implement its own version of this method.
 
         When an instance is called it performs its part of the calculations for
-        forward-propagation and then calls the next layer in the network with the
-        results of its calculations. Every instance also passes the `ys` argument
+        forward-propagation and backpropagation and then calls the next layer in the
+        network with these results. Every instance also passes the `ys` argument
         to the next layer until the LossLayer is reached, which then returns the
-        loss of the network.
+        loss of the network. If `alpha` is passed then the network will train by
+        updating the weights and biases of the DenseLayer class, each layer will
+        then return the gradients of the weights and biases.
 
         Args:
             xs: The data the layer should predict values for.
             ys: The true values of the data.
+            alpha: The learning rate of the network.
 
         Returns:
             The predicted values of the network.
             If `ys` is not `None`, the loss of the network is also returned.
+            If `alpha` is not `None`, then the network will train and return gradients.
         """
         raise NotImplementedError("Abstract __call__ method")
 

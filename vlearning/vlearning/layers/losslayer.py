@@ -45,7 +45,7 @@ class LossLayer(Layer):
         self.loss: Callable = loss
 
     @override
-    def __call__(self, xs, ys=None):
+    def __call__(self, xs, ys=None, alpha=None):
         y_hats = xs
 
         if not ys:
@@ -56,7 +56,12 @@ class LossLayer(Layer):
             sum(self.loss(y_hat[i], y[i]) for i in range(self.num_inputs))
             for y_hat, y in zip(y_hats, ys)
         ]
-        return y_hats, losses
+
+        if not alpha:
+            return y_hats, losses, None
+
+        gradients = []
+        return y_hats, losses, gradients
 
     @override
     def __repr__(self) -> str:
