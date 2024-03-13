@@ -4,9 +4,13 @@ An InputLayer is a special type of layer that is the first layer in a network an
 the only layer instance you actually interact with when using the network. Meaning
 it is the only layer that you can call the `predict` and `fit` methods on.
 """
+from typing import TypeAlias
+
 from overrides import override
 
 from . import Layer
+
+DataInstanceValues: TypeAlias = list[float]
 
 
 class InputLayer(Layer):
@@ -23,14 +27,15 @@ class InputLayer(Layer):
         next_layer (Layer | None): The next layer in the network.
     """
     @override
-    def __call__(self, xs: list[list[float]]) -> list[list[float]]:
-        return self.next_layer(xs)
+    def __call__(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
+        y_hats: list[DataInstanceValues] = self.next_layer(xs)
+        return y_hats
 
     @override
     def _set_inputs(self, num_inputs: int) -> None:
         raise TypeError("An InputLayer does not have, nor accept, inputs.")
 
-    def predict(self, xs: list[list[float]]) -> list[list[float]]:
+    def predict(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
         """Get the predicted values for the given dataset.
 
         This method is an accessibility/ease-of-use wrapper that simply calls

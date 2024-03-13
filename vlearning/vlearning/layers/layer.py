@@ -9,6 +9,9 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
+from typing import TypeAlias
+
+DataInstanceValues: TypeAlias = list[float]
 
 
 class Layer:
@@ -70,7 +73,7 @@ class Layer:
         result.add(deepcopy(new_layer))
         return result
 
-    def __call__(self, xs: list[list[float]]) -> list[list[float]]:
+    def __call__(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
         """Makes layer instances callable, used during forward-propagation.
 
         This method is meant to be overridden by subclasses and each subclass
@@ -88,7 +91,7 @@ class Layer:
         """
         raise NotImplementedError("Abstract __call__ method")
 
-    def __getitem__(self, index: [int | str]) -> Layer:
+    def __getitem__(self, index: int | str) -> Layer:
         """Implements the '[]' operator to get a layer by its index or name.
 
         Searches for a layer matching the index by recursively
