@@ -7,13 +7,10 @@ applies its activation function to create the post-activation value.
 """
 import random
 from math import sqrt
-from typing import TypeAlias
 
 from overrides import override
 
 from . import Layer
-
-DataInstanceValues: TypeAlias = list[float]
 
 
 class DenseLayer(Layer):
@@ -62,12 +59,10 @@ class DenseLayer(Layer):
         self.weights: list[list[float]] | None = None
 
     @override
-    def __call__(
-        self, xs: list[DataInstanceValues], ys: list[float] = None
-    ) -> tuple[list[DataInstanceValues], list[float] | None]:
-        aa: list[DataInstanceValues] = []
+    def __call__(self, xs, ys=None):
+        aa = []
         for x in xs:
-            a: DataInstanceValues = []
+            a = []
             for o in range(self.num_outputs):
                 # For this neuron calculate the pre-activation values for the instances
                 a.append(

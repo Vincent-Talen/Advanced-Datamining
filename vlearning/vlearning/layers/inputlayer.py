@@ -27,11 +27,8 @@ class InputLayer(Layer):
         next_layer (Layer | None): The next layer in the network.
     """
     @override
-    def __call__(
-        self, xs: list[DataInstanceValues], ys: list[float] = None
-    ) -> tuple[list[DataInstanceValues], list[float] | None]:
-        y_hats, losses = self.next_layer(xs, ys)
-        return y_hats, losses
+    def __call__(self, xs, ys=None):
+        return self.next_layer(xs, ys)
 
     @override
     def _set_inputs(self, num_inputs: int) -> None:

@@ -4,14 +4,12 @@ A LossLayer instance is the last layer in a network, it thus has no outputs and 
 layer after it, it does add a parameter and instance attribute for a loss function.
 Using this loss function it calculates the loss of the network it is part of.
 """
-from typing import Callable, TypeAlias
+from typing import Callable
 
 from overrides import override
 
 from . import Layer
 from vlearning.loss_functions import mean_squared_error
-
-DataInstanceValues: TypeAlias = list[float]
 
 
 class LossLayer(Layer):
@@ -47,10 +45,8 @@ class LossLayer(Layer):
         self.loss: Callable = loss
 
     @override
-    def __call__(
-        self, xs: list[DataInstanceValues], ys: list[float] = None
-    ) -> tuple[list[DataInstanceValues], list[float] | None]:
-        y_hats: list[DataInstanceValues] = xs
+    def __call__(self, xs, ys=None):
+        y_hats = xs
 
         if not ys:
             return y_hats, None, None
