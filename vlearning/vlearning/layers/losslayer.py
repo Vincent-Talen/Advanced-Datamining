@@ -51,12 +51,15 @@ class LossLayer(Layer):
         self, xs: list[DataInstanceValues], ys: list[float] = None
     ) -> tuple[list[DataInstanceValues], list[float] | None]:
         y_hats: list[DataInstanceValues] = xs
-        losses = None
-        if ys:
-            losses = [
-                sum(self.loss(y_hat[o], y[o]) for o in range(self.num_inputs))
-                for y_hat, y in zip(y_hats, ys)
-            ]
+
+        if not ys:
+            return y_hats, None, None
+
+        # Calculate the loss for every instance for each neuron from the output layer
+        losses: list[float] = [
+            sum(self.loss(y_hat[i], y[i]) for i in range(self.num_inputs))
+            for y_hat, y in zip(y_hats, ys)
+        ]
         return y_hats, losses
 
     @override
