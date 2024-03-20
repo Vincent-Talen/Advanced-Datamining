@@ -57,3 +57,40 @@ class InputLayer(Layer):
         """
         _, losses, _ = self(xs, ys)
         return sum(losses) / len(losses)
+
+    def partial_fit(
+        self, xs: list[list[float]], ys: list[float], *, alpha: float = 0.001
+    ) -> None:
+        """Fit/train the network to the given dataset for a single epoch.
+
+        Args:
+            xs: The instances the network should predict values for.
+            ys: A list containing the correct labels for all instances if
+                the loss should be returned, otherwise `None`.
+
+        Keyword Args:
+            alpha: The learning rate of the network.
+        """
+        self(xs, ys, alpha=alpha)
+
+    def fit(
+        self,
+        xs: list[list[float]],
+        ys: list[float] = None,
+        *,
+        alpha: float = 0.001,
+        epochs: int = 100
+    ) -> None:
+        """Fit/train the network to the given dataset for a given number of epochs.
+
+        Args:
+            xs: The instances the network should predict values for.
+            ys: A list containing the correct labels for all instances if
+                the loss should be returned, otherwise `None`.
+
+        Keyword Args:
+            alpha: The learning rate of the network.
+            epochs: The number of epochs to train the network for.
+        """
+        for _ in range(epochs):
+            self.partial_fit(xs, ys, alpha=alpha)
