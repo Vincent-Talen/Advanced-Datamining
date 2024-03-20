@@ -74,9 +74,9 @@ class Layer:
         return result
 
     def __call__(
-        self, xs: list[DataInstanceValues], ys: list[float] = None, alpha: float = None
+        self, xs: list[DataInstanceValues], ys: list[float] = None, *, alpha: float = None
     ) -> tuple[list[DataInstanceValues], list[float] | None, list[float] | None]:
-        """Makes layer instances callable, used during forward-propagation.
+        """Makes layer instances callable, used for forward- and back-propagation.
 
         This method is meant to be overridden by subclasses and each subclass
         needs to implement its own version of this method.
@@ -90,9 +90,12 @@ class Layer:
         then return the gradients of the weights and biases.
 
         Args:
-            xs: The data the layer should predict values for.
-            ys: The true values of the data.
-            alpha: The learning rate of the network.
+            xs: The instances the network should predict values for.
+            ys: A list containing the correct labels for all instances if
+                the loss should be returned, otherwise `None`.
+
+        Keyword Args:
+            alpha: The learning rate if the network should train, otherwise `None`.
 
         Returns:
             The predicted values of the network.

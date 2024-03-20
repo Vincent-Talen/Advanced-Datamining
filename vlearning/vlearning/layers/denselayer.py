@@ -59,7 +59,7 @@ class DenseLayer(Layer):
         self.weights: list[list[float]] | None = None
 
     @override
-    def __call__(self, xs, ys=None, alpha=None):
+    def __call__(self, xs, ys=None, *, alpha=None):
         aa = []
         for x in xs:
             a = []
@@ -70,7 +70,7 @@ class DenseLayer(Layer):
                 )
             aa.append(a)
 
-        y_hats, losses, gradients = self.next_layer(aa, ys, alpha)
+        y_hats, losses, gradients = self.next_layer(aa, ys, alpha=alpha)
 
         if not alpha:
             return y_hats, losses, None

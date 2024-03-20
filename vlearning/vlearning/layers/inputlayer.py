@@ -27,8 +27,8 @@ class InputLayer(Layer):
         next_layer (Layer | None): The next layer in the network.
     """
     @override
-    def __call__(self, xs, ys=None, alpha=None):
-        return self.next_layer(xs, ys, alpha)
+    def __call__(self, xs, ys=None, *, alpha=None):
+        return self.next_layer(xs, ys, alpha=alpha)
 
     @override
     def _set_inputs(self, num_inputs: int) -> None:

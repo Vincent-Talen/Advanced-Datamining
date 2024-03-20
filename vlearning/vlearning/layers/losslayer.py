@@ -45,8 +45,8 @@ class LossLayer(Layer):
         self.loss: Callable = loss
 
     @override
-    def __call__(self, xs, ys=None, alpha=None):
         y_hats = xs
+    def __call__(self, xs, ys=None, *, alpha=None):
 
         if not ys:
             return y_hats, None, None

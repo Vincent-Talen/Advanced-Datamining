@@ -55,13 +55,13 @@ class ActivationLayer(Layer):
         self.activation: Callable = activation
 
     @override
-    def __call__(self, xs, ys=None, alpha=None):
+    def __call__(self, xs, ys=None, *, alpha=None):
         hh = []
         for x in xs:
             h = [self.activation(x[o]) for o in range(self.num_outputs)]
             hh.append(h)
 
-        y_hats, losses, gradients = self.next_layer(hh, ys, alpha)
+        y_hats, losses, gradients = self.next_layer(hh, ys, alpha=alpha)
 
         if not alpha:
             return y_hats, losses, None
