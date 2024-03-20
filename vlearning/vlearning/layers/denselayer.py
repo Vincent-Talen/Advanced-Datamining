@@ -76,15 +76,15 @@ class DenseLayer(Layer):
 
         input_gradients: list[list[float]] = []
         for n in range(len(xs)):
-            q = []
+            q: list[float] = []
             for i in range(self.num_inputs):
-                q.append(sum(self.weights[o][i] * pre_a_gradients[n][o] for o in range(self.num_outputs)))
-            input_gradients.append(q)
-
-            for o in range(self.num_outputs):
-                self.biases[o] -= alpha / len(xs) * pre_a_gradients[n][o]
-                for i in range(self.num_inputs):
+                my_sum: float = 0.0
+                for o in range(self.num_outputs):
+                    my_sum += self.weights[o][i] * pre_a_gradients[n][o]
+                    self.biases[o] -= alpha / len(xs) * pre_a_gradients[n][o]
                     self.weights[o][i] -= alpha / len(xs) * pre_a_gradients[n][o] * xs[n][i]
+                q.append(my_sum)
+            input_gradients.append(q)
 
         return y_hats, losses, input_gradients
 
