@@ -76,3 +76,14 @@ class LossLayer(Layer):
         if self.next_layer is not None:
             text += f" + {self.next_layer!r}"
         return text
+
+    @override
+    def add(self, new_layer: Layer) -> None:
+        """Overrides parent's method to raise an error.
+
+        Raises:
+            TypeError: Indicates that a LossLayer can not have a layer added after it.
+        """
+        raise TypeError(
+            "A LossLayer is a network's last layer, so it can't have a layer after it."
+        )
