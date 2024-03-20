@@ -4,11 +4,11 @@ A LossLayer instance is the last layer in a network, it thus has no outputs and 
 layer after it, it does add a parameter and instance attribute for a loss function.
 Using this loss function it calculates the loss of the network it is part of.
 """
-from typing import Callable
+from collections.abc import Callable
 
 from overrides import override
 
-from . import Layer
+from vlearning.layers import Layer
 from vlearning.loss_functions import mean_squared_error
 
 
@@ -20,9 +20,9 @@ class LossLayer(Layer):
     this function is then used to compute the loss of the network.
 
     Attributes:
-        num_inputs (int): The number of inputs to the layer.
+        num_inputs (int): Number of inputs to the layer.
         name (str): The name of the layer.
-        loss (Callable): The loss function of the layer.
+        loss (Callable[[float, float], float]): The loss function of the layer.
     """
     @override
     def __init__(
@@ -42,7 +42,7 @@ class LossLayer(Layer):
             loss: The loss function of the layer.
         """
         super().__init__(None, name=name)
-        self.loss: Callable = loss
+        self.loss: Callable[[float, float], float] = loss
 
     @override
         y_hats = xs

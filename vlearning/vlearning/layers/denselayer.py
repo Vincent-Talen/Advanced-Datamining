@@ -10,7 +10,7 @@ from math import sqrt
 
 from overrides import override
 
-from . import Layer
+from vlearning.layers import Layer
 
 
 class DenseLayer(Layer):

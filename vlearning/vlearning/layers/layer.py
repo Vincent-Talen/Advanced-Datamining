@@ -9,9 +9,6 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
-from typing import TypeAlias
-
-DataInstanceValues: TypeAlias = list[float]
 
 
 class Layer:
@@ -74,8 +71,8 @@ class Layer:
         return result
 
     def __call__(
-        self, xs: list[DataInstanceValues], ys: list[float] = None, *, alpha: float = None
-    ) -> tuple[list[DataInstanceValues], list[float] | None, list[float] | None]:
+        self, xs: list[list[float]], ys: list[float] = None, *, alpha: float = None
+    ) -> tuple[list[list[float]], list[float] | None, list[list[float]] | None]:
         """Makes layer instances callable, used for forward- and back-propagation.
 
         This method is meant to be overridden by subclasses and each subclass
@@ -98,9 +95,14 @@ class Layer:
             alpha: The learning rate if the network should train, otherwise `None`.
 
         Returns:
-            The predicted values of the network.
-            If `ys` is not `None`, the loss of the network is also returned.
-            If `alpha` is not `None`, then the network will train and return gradients.
+            A tuple with 3 elements
+            `(list[list[float]], list[float] | None, list[list[float]] | None)`.
+
+            The first element is always the network's predicted values for the
+            instances, the second element has the loss for each instance if `ys` is
+            used, otherwise `None`. The third element is a list of lists, with each list
+            containing the loss gradient for every neuron of the previous layer for an
+            instance, if `alpha` is used, otherwise `None`.
         """
         raise NotImplementedError("Abstract __call__ method")
 
@@ -121,7 +123,7 @@ class Layer:
             KeyError: If the name does not exist.
             TypeError: If the index is not an integer or string.
         """
-        if index == 0 or index == self.name:
+        if index in (0, self.name):
             return self
         if isinstance(index, int):
             if self.next_layer is None:

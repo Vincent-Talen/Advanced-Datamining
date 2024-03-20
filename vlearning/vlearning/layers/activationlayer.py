@@ -5,12 +5,12 @@ It adds a parameter for an activation function and stores it as an instance attr
 this function is then used to compute the post-activation values from the pre-activation
 values computed by the DenseLayer instance that comes before it.
 """
-from typing import Callable
+from collections.abc import Callable
 
 from overrides import override
 
-from . import Layer
 from vlearning.activation_functions import linear
+from vlearning.layers import Layer
 
 
 class ActivationLayer(Layer):
@@ -35,7 +35,7 @@ class ActivationLayer(Layer):
         *,
         name: str | None = None,
         next_layer: Layer | None = None,
-        activation: Callable = linear
+        activation: Callable[[float], float] = linear
     ):
         """Overrides parent's method to add an activation function parameter+attribute.
 
@@ -52,7 +52,7 @@ class ActivationLayer(Layer):
             activation: The activation function of the layer.
         """
         super().__init__(num_outputs, name=name, next_layer=next_layer)
-        self.activation: Callable = activation
+        self.activation: Callable[[float], float] = activation
 
     @override
     def __call__(self, xs, ys=None, *, alpha=None):

@@ -14,10 +14,10 @@ def linear(a: float) -> float:
     """Linear "Identity" Activation Function
 
     Args:
-        a: pre-activation value
+        a: Pre-activation value.
 
     Returns:
-        post-activation value
+        The calculated post-activation value.
     """
     return a
 
@@ -26,27 +26,26 @@ def sign(a: float) -> float:
     """Sign (a.k.a. Signum) Activation Function
 
     Args:
-        a: pre-activation value
+        a: Pre-activation value.
 
     Returns:
-        post-activation value
+        The calculated post-activation value.
     """
     if a > 0.0:
         return 1.0
-    elif a < 0.0:
+    if a < 0.0:
         return -1.0
-    else:
-        return 0.0
+    return 0.0
 
 
 def tanh(a: float) -> float:
     """Hyperbolic Tangent Activation Function
 
     Args:
-        a: pre-activation value
+        a: Pre-activation value.
 
     Returns:
-        post-activation value
+        The calculated post-activation value.
     """
     # e_a = math_e ** a
     # e_neg_a = math_e ** -a

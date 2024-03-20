@@ -4,13 +4,9 @@ An InputLayer is a special type of layer that is the first layer in a network an
 the only layer instance you actually interact with when using the network. Meaning
 it is the only layer that you can call the `predict` and `fit` methods on.
 """
-from typing import TypeAlias
-
 from overrides import override
 
-from . import Layer
-
-DataInstanceValues: TypeAlias = list[float]
+from vlearning.layers import Layer
 
 
 class InputLayer(Layer):
@@ -34,14 +30,14 @@ class InputLayer(Layer):
     def _set_inputs(self, num_inputs: int) -> None:
         raise TypeError("An InputLayer does not have, nor accept, inputs.")
 
-    def predict(self, xs: list[DataInstanceValues]) -> list[DataInstanceValues]:
+    def predict(self, xs: list[list[float]]) -> list[list[float]]:
         """Get the predicted values for the given dataset.
 
         This method is an accessibility/ease-of-use wrapper that simply calls
         the instance itself, returning the predicted values of the network.
 
         Args:
-            xs: The data the layer should predict values for.
+            xs: The instances the network should predict values for.
 
         Returns:
             The predicted values for the given dataset.
@@ -49,12 +45,12 @@ class InputLayer(Layer):
         y_hats, _, _ = self(xs)
         return y_hats
 
-    def evaluate(self, xs: list[DataInstanceValues], ys: list[float]) -> float:
+    def evaluate(self, xs: list[list[float]], ys: list[float]) -> float:
         """Get the mean loss of the network for the instances of the given dataset.
 
         Args:
-            xs: The data the layer should predict values for.
-            ys: The true values of the data.
+            xs: The instances the network should predict values for.
+            ys: A list containing the correct labels for all instances
 
         Returns:
             The mean loss of the network for the instances of the given dataset.
