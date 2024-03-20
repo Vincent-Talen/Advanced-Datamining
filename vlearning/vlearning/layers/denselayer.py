@@ -60,23 +60,33 @@ class DenseLayer(Layer):
 
     @override
     def __call__(self, xs, ys=None, *, alpha=None):
-        aa = []
+        aa: list[list[float]] = []
         for x in xs:
-            a = []
-            for o in range(self.num_outputs):
-                # For this neuron calculate the pre-activation values for the instances
-                a.append(
-                    self.biases[o] + sum(wi * xi for wi, xi in zip(self.weights[o], x))
-                )
+            a = [
+                self.biases[o] + sum(wi * xi for wi, xi in zip(self.weights[o], x))
+                for o in range(self.num_outputs)
+            ]
             aa.append(a)
 
-        y_hats, losses, gradients = self.next_layer(aa, ys, alpha=alpha)
+        # Feed forward and receive the next layer's results and back-propagation values
+        y_hats, losses, pre_a_gradients = self.next_layer(aa, ys, alpha=alpha)
 
         if not alpha:
             return y_hats, losses, None
 
-        new_gradients = []
-        return y_hats, losses, new_gradients
+        input_gradients: list[list[float]] = []
+        for n in range(len(xs)):
+            q = []
+            for i in range(self.num_inputs):
+                q.append(sum(self.weights[o][i] * pre_a_gradients[n][o] for o in range(self.num_outputs)))
+            input_gradients.append(q)
+
+            for o in range(self.num_outputs):
+                self.biases[o] -= alpha / len(xs) * pre_a_gradients[n][o]
+                for i in range(self.num_inputs):
+                    self.weights[o][i] -= alpha / len(xs) * pre_a_gradients[n][o] * xs[n][i]
+
+        return y_hats, losses, input_gradients
 
     @override
     def _set_inputs(self, num_inputs: int) -> None:

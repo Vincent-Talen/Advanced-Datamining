@@ -9,6 +9,7 @@ from collections.abc import Callable
 
 from overrides import override
 
+from vlearning import derivative
 from vlearning.activation_functions import linear
 from vlearning.layers import Layer
 
@@ -27,6 +28,7 @@ class ActivationLayer(Layer):
         name (str): The name of the layer.
         next_layer (Layer | None): The next layer in the network.
         activation (Callable): The activation function of the layer.
+        activation_prime (Callable): The derivative of the activation function.
     """
     @override
     def __init__(
@@ -53,21 +55,28 @@ class ActivationLayer(Layer):
         """
         super().__init__(num_outputs, name=name, next_layer=next_layer)
         self.activation: Callable[[float], float] = activation
+        self.activation_prime: Callable[[float], float] = derivative(activation)
 
     @override
     def __call__(self, xs, ys=None, *, alpha=None):
-        hh = []
-        for x in xs:
-            h = [self.activation(x[o]) for o in range(self.num_outputs)]
-            hh.append(h)
 
-        y_hats, losses, gradients = self.next_layer(hh, ys, alpha=alpha)
+        # Apply the activation function to each neuron's value for every instance
+        hs: list[list[float]] = [
+            [self.activation(x[o]) for o in range(self.num_outputs)]
+            for x in xs
+        ]
+
+        # Feed forward and receive the next layer's results and back-propagation values
+        y_hats, losses, loss_gradients = self.next_layer(hs, ys, alpha=alpha)
 
         if not alpha:
             return y_hats, losses, None
 
-        new_gradients = []
-        return y_hats, losses, new_gradients
+        pre_a_gradients: list[list[float]] = [
+            [self.activation_prime(a[i]) * g[i] for i in range(self.num_inputs)]
+            for a, g in zip(xs, loss_gradients)
+        ]
+        return y_hats, losses, pre_a_gradients
 
     @override
     def __repr__(self) -> str:
