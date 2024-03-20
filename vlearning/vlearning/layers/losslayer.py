@@ -8,6 +8,7 @@ from collections.abc import Callable
 
 from overrides import override
 
+from vlearning import derivative
 from vlearning.layers import Layer
 from vlearning.loss_functions import mean_squared_error
 
@@ -23,6 +24,7 @@ class LossLayer(Layer):
         num_inputs (int): Number of inputs to the layer.
         name (str): The name of the layer.
         loss (Callable[[float, float], float]): The loss function of the layer.
+        loss_prime (Callable[[float, float], float]): Derivative of the loss function.
     """
     @override
     def __init__(
@@ -43,24 +45,53 @@ class LossLayer(Layer):
         """
         super().__init__(None, name=name)
         self.loss: Callable[[float, float], float] = loss
+        self.loss_prime: Callable[[float, float], float] = derivative(loss)
 
     @override
-        y_hats = xs
     def __call__(self, xs, ys=None, *, alpha=None):
+        """Makes `LossLayer`s callable and implements forward- & back-propagation.
 
+        This method always returns the predicted values for the given dataset, if the
+        correct labels are passed through the `ys` argument it also returns the loss
+        for each instance. If the network should train, meaning that a learning rate is
+        passed to the alpha parameter, then the loss gradient will also be calculated
+        for each attribute of every instance and this will then also be returned.
+
+        Args:
+            xs: A list with the predicted values by the network for all instances.
+            ys: A list containing the correct labels for all instances if
+                the loss should be returned, otherwise `None`.
+
+        Keyword Args:
+            alpha: The learning rate if the network should train, otherwise `None`.
+
+        Returns:
+            A tuple with 3 elements
+            `(list[list[float]], list[float] | None, list[list[float]] | None)`.
+
+            The first element is always the network's predicted values for the
+            instances, the second element has the loss for each instance if `ys` is
+            used, otherwise `None`. The third element is a list with a list for every
+            instance, each containing the loss gradient for every neuron of the output
+            layer, if `alpha` is used, otherwise `None`.
+        """
+        y_hats = xs
         if not ys:
             return y_hats, None, None
 
-        # Calculate the loss for every instance for each neuron from the output layer
+        # Calculate the total loss for every instance
         losses: list[float] = [
             sum(self.loss(y_hat[i], y[i]) for i in range(self.num_inputs))
             for y_hat, y in zip(y_hats, ys)
         ]
-
         if not alpha:
             return y_hats, losses, None
 
-        gradients = []
+        # Per instance, calculate the loss gradient for each neuron of the output layer
+        gradients: list[list[float]] = [
+            [self.loss_prime(y_hat[i], y[i]) for i in range(self.num_inputs)]
+            for y_hat, y in zip(y_hats, ys)
+        ]
         return y_hats, losses, gradients
 
     @override
