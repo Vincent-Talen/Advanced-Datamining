@@ -69,24 +69,25 @@ class DenseLayer(Layer):
             aa.append(a)
 
         # Feed forward and receive the next layer's results and back-propagation values
-        y_hats, losses, pre_a_gradients = self.next_layer(aa, ys, alpha=alpha)
-
+        y_hats, losses, gradients = self.next_layer(aa, ys, alpha=alpha)
         if not alpha:
             return y_hats, losses, None
 
-        input_gradients: list[list[float]] = []
+        scaled_alpha = alpha / len(xs)
+        new_gradients: list[list[float]] = []
         for n in range(len(xs)):
-            q: list[float] = []
+            new_instance_gradients: list[float] = []
             for i in range(self.num_inputs):
-                my_sum: float = 0.0
+                new_input_gradient: float = 0.0
                 for o in range(self.num_outputs):
-                    my_sum += self.weights[o][i] * pre_a_gradients[n][o]
-                    self.biases[o] -= alpha / len(xs) * pre_a_gradients[n][o]
-                    self.weights[o][i] -= alpha / len(xs) * pre_a_gradients[n][o] * xs[n][i]
-                q.append(my_sum)
-            input_gradients.append(q)
+                    neuron_out_gradient = gradients[n][o]
+                    new_input_gradient += self.weights[o][i] * neuron_out_gradient
+                    self.biases[o] -= scaled_alpha * neuron_out_gradient
+                    self.weights[o][i] -= scaled_alpha * neuron_out_gradient * xs[n][i]
+                new_instance_gradients.append(new_input_gradient)
+            new_gradients.append(new_instance_gradients)
 
-        return y_hats, losses, input_gradients
+        return y_hats, losses, new_gradients
 
     @override
     def _set_inputs(self, num_inputs: int) -> None:
