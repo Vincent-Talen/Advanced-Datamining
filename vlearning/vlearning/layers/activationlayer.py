@@ -88,5 +88,5 @@ class ActivationLayer(Layer):
             ")"
         )
         if self.next_layer is not None:
-            text += f" + {self.next_layer!r}"
+            text += f" +\n\t{self.next_layer!r}"
         return text

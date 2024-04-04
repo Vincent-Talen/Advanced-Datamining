@@ -181,7 +181,7 @@ class Layer:
             ")"
         )
         if self.next_layer is not None:
-            text += f" + {self.next_layer!r}"
+            text += f" +\n\t{self.next_layer!r}"
         return text
 
     def _set_inputs(self, num_inputs: int) -> None:
