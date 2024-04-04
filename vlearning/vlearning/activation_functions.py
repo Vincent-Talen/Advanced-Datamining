@@ -52,3 +52,15 @@ def tanh(a: float) -> float:
     # e_neg_a = math_e ** -a
     # return (e_a - e_neg_a) / (e_a + e_neg_a)
     return math_tanh(a)
+
+
+def softsign(a: float) -> float:
+    """Softsign Activation Function
+
+    Args:
+        a: Pre-activation value.
+
+    Returns:
+        The calculated post-activation value.
+    """
+    return a / (1 + abs(a))

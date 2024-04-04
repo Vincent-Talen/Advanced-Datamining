@@ -45,7 +45,7 @@ class InputLayer(Layer):
         y_hats, _, _ = self(xs)
         return y_hats
 
-    def evaluate(self, xs: list[list[float]], labels: list[float]) -> float:
+    def evaluate(self, xs: list[list[float]], labels: list[list[float]]) -> float:
         """Get the mean loss of the network for the instances of the given dataset.
 
         Args:
@@ -59,7 +59,7 @@ class InputLayer(Layer):
         return sum(losses) / len(losses)
 
     def partial_fit(
-        self, xs: list[list[float]], labels: list[float], *, alpha: float = 0.001
+        self, xs: list[list[float]], labels: list[list[float]], *, alpha: float = 0.001
     ) -> None:
         """Fit/train the network to the given dataset for a single epoch.
 
@@ -79,7 +79,7 @@ class InputLayer(Layer):
     def fit(
         self,
         xs: list[list[float]],
-        labels: list[float] = None,
+        labels: list[list[float]] = None,
         *,
         alpha: float = 0.001,
         epochs: int = 100
