@@ -71,7 +71,11 @@ class Layer:
         return result
 
     def __call__(
-        self, xs: list[list[float]], ys: list[float] = None, *, alpha: float = None
+        self,
+        xs: list[list[float]],
+        labels: list[list[float]] = None,
+        *,
+        alpha: float = None
     ) -> tuple[list[list[float]], list[float] | None, list[list[float]] | None]:
         """Makes layer instances callable, used for forward- and back-propagation.
 
@@ -80,29 +84,32 @@ class Layer:
 
         When an instance is called it performs its part of the calculations for
         forward-propagation and backpropagation and then calls the next layer in the
-        network with these results. Every instance also passes the `ys` argument
+        network with these results. Every instance also passes the `labels` argument
         to the next layer until the LossLayer is reached, which then returns the
         loss of the network. If `alpha` is passed then the network will train by
         updating the weights and biases of the DenseLayer class, each layer will
         then return the gradients of the weights and biases.
 
         Args:
-            xs: The instances the network should predict values for.
-            ys: A list containing the correct labels for all instances if
-                the loss should be returned, otherwise `None`.
+            xs:
+                The instances the network should predict values for.
+            labels:
+                A list containing the correct label per feature of each instance if the
+                loss should be returned, otherwise `None`.
 
         Keyword Args:
-            alpha: The learning rate if the network should train, otherwise `None`.
+            alpha:
+                The learning rate if the network should train, otherwise `None`.
 
         Returns:
             A tuple with 3 elements
             `(list[list[float]], list[float] | None, list[list[float]] | None)`.
 
             The first element is always the network's predicted values for the
-            instances, the second element has the loss for each instance if `ys` is
             used, otherwise `None`. The third element is a list of lists, with each list
             containing the loss gradient for every neuron of the previous layer for an
             instance, if `alpha` is used, otherwise `None`.
+            instances, the second element has the loss for each instance if `labels` is
         """
         raise NotImplementedError("Abstract __call__ method")
 

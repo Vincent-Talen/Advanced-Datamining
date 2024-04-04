@@ -58,7 +58,7 @@ class ActivationLayer(Layer):
         self.activation_prime: Callable[[float], float] = derivative(activation)
 
     @override
-    def __call__(self, xs, ys=None, *, alpha=None):
+    def __call__(self, xs, labels=None, *, alpha=None):
 
         # Apply the activation function to each neuron's value for every instance
         hs: list[list[float]] = [

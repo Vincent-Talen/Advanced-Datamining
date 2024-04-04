@@ -23,8 +23,8 @@ class InputLayer(Layer):
         next_layer (Layer | None): The next layer in the network.
     """
     @override
-    def __call__(self, xs, ys=None, *, alpha=None):
-        return self.next_layer(xs, ys, alpha=alpha)
+    def __call__(self, xs, labels=None, *, alpha=None):
+        return self.next_layer(xs, labels, alpha=alpha)
 
     @override
     def _set_inputs(self, num_inputs: int) -> None:
@@ -45,38 +45,41 @@ class InputLayer(Layer):
         y_hats, _, _ = self(xs)
         return y_hats
 
-    def evaluate(self, xs: list[list[float]], ys: list[float]) -> float:
+    def evaluate(self, xs: list[list[float]], labels: list[float]) -> float:
         """Get the mean loss of the network for the instances of the given dataset.
 
         Args:
             xs: The instances the network should predict values for.
-            ys: A list containing the correct labels for all instances
+            labels: A list containing the correct labels for all instances
 
         Returns:
             The mean loss of the network for the instances of the given dataset.
         """
-        _, losses, _ = self(xs, ys)
+        _, losses, _ = self(xs, labels)
         return sum(losses) / len(losses)
 
     def partial_fit(
-        self, xs: list[list[float]], ys: list[float], *, alpha: float = 0.001
+        self, xs: list[list[float]], labels: list[float], *, alpha: float = 0.001
     ) -> None:
         """Fit/train the network to the given dataset for a single epoch.
 
         Args:
-            xs: The instances the network should predict values for.
-            ys: A list containing the correct labels for all instances if
-                the loss should be returned, otherwise `None`.
+            xs:
+                The instances the network should predict values for.
+            labels:
+                A list containing the correct label per feature of each instance if the
+                loss should be returned, otherwise `None`.
 
         Keyword Args:
-            alpha: The learning rate of the network.
+            alpha:
+                The learning rate of the network.
         """
-        self(xs, ys, alpha=alpha)
+        self(xs, labels, alpha=alpha)
 
     def fit(
         self,
         xs: list[list[float]],
-        ys: list[float] = None,
+        labels: list[float] = None,
         *,
         alpha: float = 0.001,
         epochs: int = 100
@@ -85,7 +88,7 @@ class InputLayer(Layer):
 
         Args:
             xs: The instances the network should predict values for.
-            ys: A list containing the correct labels for all instances if
+            labels: A list containing the correct labels for all instances if
                 the loss should be returned, otherwise `None`.
 
         Keyword Args:
@@ -93,4 +96,4 @@ class InputLayer(Layer):
             epochs: The number of epochs to train the network for.
         """
         for _ in range(epochs):
-            self.partial_fit(xs, ys, alpha=alpha)
+            self.partial_fit(xs, labels, alpha=alpha)
