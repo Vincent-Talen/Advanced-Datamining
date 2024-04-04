@@ -87,8 +87,9 @@ class Layer:
         network with these results. Every instance also passes the `labels` argument
         to the next layer until the LossLayer is reached, which then returns the
         loss of the network. If `alpha` is passed then the network will train by
-        updating the weights and biases of the DenseLayer class, each layer will
-        then return the gradients of the weights and biases.
+        updating the weights and biases of DenseLayer instances, in order to do this
+        every other layer will calculate and return the gradients of the loss to the
+        values it receives from the layer before.
 
         Args:
             xs:
@@ -106,10 +107,11 @@ class Layer:
             `(list[list[float]], list[float] | None, list[list[float]] | None)`.
 
             The first element is always the network's predicted values for the
-            used, otherwise `None`. The third element is a list of lists, with each list
-            containing the loss gradient for every neuron of the previous layer for an
-            instance, if `alpha` is used, otherwise `None`.
             instances, the second element has the loss for each instance if `labels` is
+            used, otherwise `None`. The third element is `None` if `alpha` is not used,
+            otherwise it is a list that contains a list for every instance, where each
+            list contains the gradient of the loss to the input it receives from the
+            layer before, for every feature (neuron of current layer) of that instance.
         """
         raise NotImplementedError("Abstract __call__ method")
 

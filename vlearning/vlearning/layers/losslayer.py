@@ -51,11 +51,12 @@ class LossLayer(Layer):
     def __call__(self, y_hats, labels=None, *, alpha=None):
         """Makes `LossLayer`s callable and implements forward- & back-propagation.
 
-        This method always returns the predicted values for the given dataset, if the
-        correct labels are passed through the `ys` argument it also returns the loss
-        for each instance. If the network should train, meaning that a learning rate is
-        passed to the alpha parameter, then the loss gradient will also be calculated
-        for each attribute of every instance and this will then also be returned.
+        This layer always returns the predicted values for the given dataset, if the
+        expected labels are passed through the `labels` argument it also returns the
+        loss for each instance. If the network should train, meaning that a learning
+        rate was passed to the `alpha` parameter, then the gradient of the loss to the
+        predicted value will also be calculated for every feature (output value) of
+        each instance.
 
         Args:
             y_hats:
@@ -73,11 +74,13 @@ class LossLayer(Layer):
             `(list[list[float]], list[float] | None, list[list[float]] | None)`.
 
             The first element is always the network's predicted values for the
-            used, otherwise `None`. The third element is a list with a list for every
-            instance, each containing the loss gradient for every neuron of the output
-            layer, if `alpha` is used, otherwise `None`.
             instances, the second element has the loss for each instance if `labels` is
+            used, otherwise `None`. The third element is `None` if `alpha` is not used,
+            otherwise it is a list that contains a list for every instance, where each
+            list contains the gradient of the loss to the predicted value by the network
+            for every feature (output layer neuron) of that instance.
         """
+        # If no labels were given then return early with only the predicted values
         if not labels:
             return y_hats, None, None
 
@@ -89,7 +92,7 @@ class LossLayer(Layer):
         if not alpha:
             return y_hats, losses, None
 
-        # Per instance, calculate the loss gradient for each neuron of the output layer
+        # Calculate the gradient of the loss to the predicted value
         gradients: list[list[float]] = [
             [self.loss_prime(y_hat[i], label[i]) for i in range(self.num_inputs)]
             for y_hat, label in zip(y_hats, labels)

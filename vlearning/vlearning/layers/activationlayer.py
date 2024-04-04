@@ -59,7 +59,39 @@ class ActivationLayer(Layer):
 
     @override
     def __call__(self, xs, labels=None, *, alpha=None):
+        """Makes `ActivationLayer`s callable and implements forward- & back-propagation.
 
+        An ActivationLayer applies the activation function it got assigned to the
+        pre-activation values it receives from the previous (dense) layer. The results
+        are the outputs of the current hidden layer this instance is part of, when it is
+        the last layer in a network then the outputs are considered the final
+        predictions. If the correct labels were passed then it will simply return them
+        to the next layer again. If the network should train, then all the gradients of
+        the loss to the pre-activation values will also be calculated.
+
+        Args:
+            xs:
+                A list with a pre-activation value per neuron for all instances.
+            labels:
+                A list containing the correct label per feature of each instance if the
+                loss should be returned, otherwise `None`.
+
+        Keyword Args:
+            alpha:
+                The learning rate if the network should train, otherwise `None`.
+
+        Returns:
+            A tuple with 3 elements
+            `(list[list[float]], list[float] | None, list[list[float]] | None)`.
+
+            The first element is always the network's predicted values for the
+            instances, the second element contains the loss for each instance if
+            `labels` is used, otherwise `None`. The third element is `None` if `alpha`
+            is not used, otherwise it is a list that contains a list for every instance,
+            where each list contains the gradient of the loss to the pre-activation
+            values it receives from the layer before it, for every feature (neuron of
+            current layer) of that instance.
+        """
         # Apply the activation function to each neuron's value for every instance
         hs: list[list[float]] = [
             [self.activation(x[o]) for o in range(self.num_outputs)]
@@ -72,6 +104,7 @@ class ActivationLayer(Layer):
         if not alpha:
             return y_hats, losses, None
 
+        # Calculate the gradient of the loss to the pre-activation values
         new_gradients: list[list[float]] = [
             [self.activation_prime(a[i]) * g[i] for i in range(self.num_inputs)]
             for a, g in zip(xs, gradients)

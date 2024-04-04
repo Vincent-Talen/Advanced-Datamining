@@ -60,6 +60,43 @@ class DenseLayer(Layer):
 
     @override
     def __call__(self, xs, labels=None, *, alpha=None):
+        """Makes `DenseLayer`s callable and implements forward- & back-propagation.
+
+        This layer performs a weighted linear combination of the inputs it receives and
+        its weights and biases to compute the pre-activation (linear output) values. It
+        then passes these values to the next layer in the network, which is normally an
+        ActivationLayer. If the correct labels were passed then it will simply return
+        them to the next layer again. If the network should train, meaning that a
+        learning rate was passed to the `alpha` parameter, then the weights and biases
+        will be updated using the gradient it received of the loss to the pre-activation
+        values had calculated. In case this layer is not the first hidden layer in the
+        network, it will also calculate and return new gradients of the loss to the
+        input values it received from the layer before.
+
+        Args:
+            xs:
+                A list with values for all instances and their attributes.
+            labels:
+                A list containing the correct label per feature of each instance if the
+                loss should be returned, otherwise `None`.
+
+        Keyword Args:
+            alpha:
+                The learning rate if the network should train, otherwise `None`.
+
+        Returns:
+            A tuple with 3 elements
+            `(list[list[float]], list[float] | None, list[list[float]] | None)`.
+
+            The first element is always the network's predicted values for the
+            instances, calculated by the current (hidden) layer. The second element
+            contains the loss for each instance if `labels` is used, otherwise `None`.
+            The third element is `None` if `alpha` is not used, otherwise it is a list
+            that contains a list for every instance, where each list contains the
+            gradient of the loss to the input it receives from the layer before, for
+            every feature (neuron of current layer) of that instance.
+        """
+        linear_outputs: list[list[float]] = []
         for x in xs:
             a = [
                 self.biases[o] + sum(wi * xi for wi, xi in zip(self.weights[o], x))
@@ -72,14 +109,14 @@ class DenseLayer(Layer):
         if not alpha:
             return y_hats, losses, None
 
-        scaled_alpha = alpha / len(xs)
+        scaled_alpha: float = alpha / len(xs)
         new_gradients: list[list[float]] = []
         for n, x in enumerate(xs):
             instance_gradients: list[float] = []
             for i in range(self.num_inputs):
                 neuron_in_gradient: float = 0.0
                 for o in range(self.num_outputs):
-                    neuron_out_gradient = gradients[n][o]
+                    neuron_out_gradient: float = gradients[n][o]
                     neuron_in_gradient += self.weights[o][i] * neuron_out_gradient
                     self.biases[o] -= scaled_alpha * neuron_out_gradient
                     self.weights[o][i] -= scaled_alpha * neuron_out_gradient * x[i]
