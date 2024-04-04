@@ -67,16 +67,16 @@ class ActivationLayer(Layer):
         ]
 
         # Feed forward and receive the next layer's results and back-propagation values
-        y_hats, losses, loss_gradients = self.next_layer(hs, ys, alpha=alpha)
+        y_hats, losses, gradients = self.next_layer(hs, labels, alpha=alpha)
 
         if not alpha:
             return y_hats, losses, None
 
-        pre_a_gradients: list[list[float]] = [
+        new_gradients: list[list[float]] = [
             [self.activation_prime(a[i]) * g[i] for i in range(self.num_inputs)]
-            for a, g in zip(xs, loss_gradients)
+            for a, g in zip(xs, gradients)
         ]
-        return y_hats, losses, pre_a_gradients
+        return y_hats, losses, new_gradients
 
     @override
     def __repr__(self) -> str:

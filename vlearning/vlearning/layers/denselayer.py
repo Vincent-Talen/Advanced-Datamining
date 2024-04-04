@@ -76,16 +76,16 @@ class DenseLayer(Layer):
         scaled_alpha = alpha / len(xs)
         new_gradients: list[list[float]] = []
         for n in range(len(xs)):
-            new_instance_gradients: list[float] = []
+            instance_gradients: list[float] = []
             for i in range(self.num_inputs):
-                new_input_gradient: float = 0.0
+                neuron_in_gradient: float = 0.0
                 for o in range(self.num_outputs):
                     neuron_out_gradient = gradients[n][o]
-                    new_input_gradient += self.weights[o][i] * neuron_out_gradient
+                    neuron_in_gradient += self.weights[o][i] * neuron_out_gradient
                     self.biases[o] -= scaled_alpha * neuron_out_gradient
                     self.weights[o][i] -= scaled_alpha * neuron_out_gradient * xs[n][i]
-                new_instance_gradients.append(new_input_gradient)
-            new_gradients.append(new_instance_gradients)
+                instance_gradients.append(neuron_in_gradient)
+            new_gradients.append(instance_gradients)
 
         return y_hats, losses, new_gradients
 
