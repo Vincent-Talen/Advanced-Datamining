@@ -48,7 +48,7 @@ class LossLayer(Layer):
         self.loss_prime: Callable[[float, float], float] = derivative(loss)
 
     @override
-    def __call__(self, xs, labels=None, *, alpha=None):
+    def __call__(self, y_hats, labels=None, *, alpha=None):
         """Makes `LossLayer`s callable and implements forward- & back-propagation.
 
         This method always returns the predicted values for the given dataset, if the
@@ -58,7 +58,7 @@ class LossLayer(Layer):
         for each attribute of every instance and this will then also be returned.
 
         Args:
-            xs:
+            y_hats:
                 A list with the predicted values by the network for all instances.
             labels:
                 A list containing the correct label per feature of each instance if the
@@ -78,7 +78,6 @@ class LossLayer(Layer):
             layer, if `alpha` is used, otherwise `None`.
             instances, the second element has the loss for each instance if `labels` is
         """
-        y_hats = xs
         if not labels:
             return y_hats, None, None
 
