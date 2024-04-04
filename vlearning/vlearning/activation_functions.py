@@ -5,7 +5,8 @@ Available activation functions:
     - sign
     - tanh
 """
-from math import e as math_e, tanh as math_tanh
+from math import tanh as math_tanh
+# from math import e as math_e, tanh as math_tanh
 
 __all__ = ["linear", "sign", "tanh"]
 
