@@ -26,27 +26,6 @@ class SoftmaxLayer(Layer):
         next_layer (Layer | None): The next layer in the network.
     """
     @override
-    def __init__(
-        self,
-        num_outputs: int,
-        *,
-        name: str | None = None,
-        next_layer: Layer | None = None
-    ):
-        """Overrides parent's method to remove unneeded/unsupported parameters.
-
-        ???
-
-        Args:
-            num_outputs: The number of outputs from the layer.
-
-        Keyword Args:
-            name: The name of the layer.
-            next_layer: The next layer in the network.
-        """
-        super().__init__(num_outputs, name=name, next_layer=next_layer)
-
-    @override
     def __call__(self, linear_outputs, labels=None, *, alpha=None):
         """Makes `SoftmaxLayer`s callable and implements forward- & back-propagation.
 
