@@ -9,6 +9,7 @@ Available activation functions:
     - softplus
     - relu
     - swish
+    - nipuna
 """
 from math import tanh as math_tanh, exp, log1p
 
@@ -21,6 +22,7 @@ __all__ = [
     "softplus",
     "relu",
     "swish",
+    "nipuna",
 ]
 
 
@@ -105,7 +107,7 @@ def softplus(a: float) -> float:
     Returns:
         The calculated post-activation value.
     """
-    return log1p(exp(-abs(a))) + max(a, 0)
+    return log1p(exp(-abs(a))) + max(a, 0.0)
 
 
 def relu(a: float) -> float:
@@ -120,7 +122,7 @@ def relu(a: float) -> float:
     return max(0.0, a)
 
 
-def swish(a: float, *, beta: float = 1) -> float:
+def swish(a: float, *, beta: float = 1.0) -> float:
     """Sigmoid-weighted Linear Unit (swish) Activation Function
 
     Args:
@@ -133,3 +135,23 @@ def swish(a: float, *, beta: float = 1) -> float:
         The calculated post-activation value.
     """
     return a * sigmoid(beta * a)
+
+
+def nipuna(a: float, *, beta: float = 1.0) -> float:
+    """NIPUNA Activation Function
+
+    Args:
+        a: Pre-activation value.
+
+    Keyword Args:
+        beta: The beta parameter to control the sharpness of the function.
+
+    Returns:
+        The calculated post-activation value.
+    """
+    if a >= 0:
+        x = a / (1 + exp(-beta * a))
+    else:
+        exp_beta_a = exp(beta * a)
+        x = a * exp_beta_a / (1 + exp_beta_a)
+    return max(x, a)
