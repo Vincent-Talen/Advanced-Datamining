@@ -21,7 +21,31 @@ class InputLayer(Layer):
         num_outputs (int): The number of outputs from the layer.
         name (str): The name of the layer.
         next_layer (Layer | None): The next layer in the network.
+        training_history (dict[str, list[float]]): Dictionary storing training history
     """
+    @override
+    def __init__(
+        self,
+        num_outputs: int,
+        *,
+        name: str | None = None,
+        next_layer: Layer | None = None,
+    ):
+        """Overrides parent's method to add a training_history instance attribute.
+
+        To keep track of the loss, accuracy, etc. of the network during training,
+        the `training_history` attribute can be used and accessed by the fit methods.
+
+        Args:
+            num_outputs: The number of outputs from the layer.
+
+        Keyword Args:
+            name: The name of the layer.
+            next_layer: The next layer in the network.
+        """
+        super().__init__(num_outputs, name=name, next_layer=next_layer)
+        self.training_history = {"loss": []}
+
     @override
     def __call__(self, xs, labels=None, *, alpha=None):
         return self.next_layer(xs, labels, alpha=alpha)
@@ -63,6 +87,9 @@ class InputLayer(Layer):
     ) -> None:
         """Fit/train the network to the given dataset for a single epoch.
 
+        After training this one epoch the loss of the network is calculated and stored
+        in the `training_history` instance attribute.
+
         Args:
             xs:
                 The instances the network should predict values for.
@@ -74,7 +101,8 @@ class InputLayer(Layer):
             alpha:
                 The learning rate of the network.
         """
-        self(xs, labels, alpha=alpha)
+        _, losses, _ = self(xs, labels, alpha=alpha)
+        self.training_history["loss"].append(sum(losses) / len(losses))
 
     def fit(
         self,
@@ -83,7 +111,7 @@ class InputLayer(Layer):
         *,
         alpha: float = 0.001,
         epochs: int = 100
-    ) -> None:
+    ) -> dict[str, list[float]]:
         """Fit/train the network to the given dataset for a given number of epochs.
 
         Args:
@@ -94,6 +122,10 @@ class InputLayer(Layer):
         Keyword Args:
             alpha: The learning rate of the network.
             epochs: The number of epochs to train the network for.
+
+        Returns:
+            A dictionary containing the training history of the network.
         """
         for _ in range(epochs):
             self.partial_fit(xs, labels, alpha=alpha)
+        return self.training_history
