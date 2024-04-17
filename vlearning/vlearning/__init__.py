@@ -7,6 +7,7 @@ based on the mathematical concepts taught in the course.
 
 Functions:
     derivative: Create a numerical derivative function of a function.
+    pseudo_log: Pseudo logarithmic function for values close to, or below, 0.
 
 Classes:
     Perceptron: A single layer neural network.
@@ -26,6 +27,7 @@ __version__ = importlib.metadata.version(__package__ or __name__)
 
 # Imports to make some functions and Classes, located within modules, directly available
 from vlearning.derivative import derivative
+from vlearning.pseudo_log import pseudo_log
 from vlearning.neuron import Neuron
 from vlearning.perceptron import Perceptron
 from vlearning.linear_regression import LinearRegression
@@ -36,6 +38,7 @@ __all__ = [
     "data",
     # Functions
     "derivative",
+    "pseudo_log",
     # Classes
     "Perceptron",
     "Neuron",
