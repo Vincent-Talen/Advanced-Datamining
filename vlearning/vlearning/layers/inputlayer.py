@@ -83,12 +83,20 @@ class InputLayer(Layer):
         return sum(losses) / len(losses)
 
     def partial_fit(
-        self, xs: list[list[float]], labels: list[list[float]], *, alpha: float = 0.001
+        self,
+        xs: list[list[float]],
+        labels: list[list[float]],
+        *,
+        alpha: float = 0.001,
+        validation_data: tuple[list[list[float]], list[list[float]]] = None,
     ) -> None:
         """Fit/train the network to the given dataset for a single epoch.
 
         After training this one epoch the loss of the network is calculated and stored
-        in the `training_history` instance attribute.
+        in the `training_history` instance attribute. If the `validation_data` argument
+        is provided, the network will be evaluated on this data after each epoch and the
+        validation loss will be stored in the `training_history` under the
+        `validation_loss` key.
 
         Args:
             xs:
@@ -100,9 +108,15 @@ class InputLayer(Layer):
         Keyword Args:
             alpha:
                 The learning rate of the network.
+            validation_data:
+                A tuple containing two lists, the first being the validation data itself
+                and the second the expected/actual labels for the validation instances.
         """
         _, losses, _ = self(xs, labels, alpha=alpha)
         self.training_history["loss"].append(sum(losses) / len(losses))
+        if validation_data:
+            validation_loss = self.evaluate(*validation_data)
+            self.training_history["validation_loss"].append(validation_loss)
 
     def fit(
         self,
@@ -110,22 +124,38 @@ class InputLayer(Layer):
         labels: list[list[float]] = None,
         *,
         alpha: float = 0.001,
-        epochs: int = 100
+        epochs: int = 100,
+        validation_data: tuple[list[list[float]], list[list[float]]] = None,
     ) -> dict[str, list[float]]:
         """Fit/train the network to the given dataset for a given number of epochs.
 
+        If the `validation_data` argument is provided, the network will be evaluated
+        on this data after each epoch and the validation loss will be stored in the
+        `training_history` under the `validation_loss` key.
+
         Args:
-            xs: The instances the network should predict values for.
-            labels: A list containing the correct labels for all instances if
-                the loss should be returned, otherwise `None`.
+            xs:
+                The instances the network should predict values for.
+            labels:
+                A list containing the correct labels for all instances if the loss
+                should be returned, otherwise `None`.
 
         Keyword Args:
-            alpha: The learning rate of the network.
-            epochs: The number of epochs to train the network for.
+            alpha:
+                The learning rate of the network.
+            epochs:
+                The number of epochs to train the network for.
+            validation_data:
+                A tuple containing two lists, the first being the validation data itself
+                and the second the expected/actual labels for the validation instances.
 
         Returns:
             A dictionary containing the training history of the network.
         """
+        if validation_data:
+            self.training_history.setdefault("validation_loss", [])
+
         for _ in range(epochs):
-            self.partial_fit(xs, labels, alpha=alpha)
+            self.partial_fit(xs, labels, alpha=alpha, validation_data=validation_data)
+
         return self.training_history
