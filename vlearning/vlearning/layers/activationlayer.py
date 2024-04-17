@@ -114,7 +114,7 @@ class ActivationLayer(Layer):
     @override
     def __repr__(self) -> str:
         text = (
-            f"{type(self).__name__}("
+            f"ActivationLayer("
             f"num_outputs={self.num_outputs}, "
             f"name='{self.name}', "
             f"activation='{self.activation.__name__}'"

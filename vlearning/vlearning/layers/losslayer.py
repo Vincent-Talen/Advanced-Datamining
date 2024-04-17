@@ -102,7 +102,7 @@ class LossLayer(Layer):
     @override
     def __repr__(self) -> str:
         text = (
-            f"{type(self).__name__}("
+            f"LossLayer("
             f"num_inputs={self.num_inputs}, "
             f"name='{self.name}', "
             f"loss='{self.loss.__name__}'"

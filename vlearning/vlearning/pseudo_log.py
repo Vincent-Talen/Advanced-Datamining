@@ -1,4 +1,4 @@
-"""This module contains a function
+"""This module has a function that doesn't crash calculating the log of values below 0.
 
 Typical usage example:
 

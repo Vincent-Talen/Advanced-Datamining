@@ -15,7 +15,9 @@ from vlearning.layers import Layer
 class SoftmaxLayer(Layer):
     """A layer that can be used for multinomial classification to return probabilities.
 
-    Can be seen as a vector function that is applied to the output of the network.
+    The SoftmaxLayer is can be seen as a vector function that is applied to the output
+    of the network to convert the values to probabilities. This is done by applying the
+    softmax function to the output values of every instance.
 
     Attributes:
         num_inputs (int): Number of inputs to the layer.
@@ -48,7 +50,11 @@ class SoftmaxLayer(Layer):
     def __call__(self, linear_outputs, labels=None, *, alpha=None):
         """Makes `SoftmaxLayer`s callable and implements forward- & back-propagation.
 
-        ???
+        To prevent numerical under- and overflow every value is subtracted by the
+        maximum value of the instance. Only after this correction the exponential is
+        calculated for each value and then the sum of them for the current instance.
+        Using the exponential values and their sum the probabilities are calculated by
+        performing the softmax formula.
 
         Args:
             linear_outputs:
@@ -87,7 +93,7 @@ class SoftmaxLayer(Layer):
         if not alpha:
             return y_hats, losses, None
 
-        # Calculate the gradient of the loss to the pre-activation values
+        # Calculate the gradient of the loss to the predicted probabilities
         new_gradients: list[list[float]] = []
         for y_hat, gradient in zip(y_hats, gradients):
             instance_gradients = [
