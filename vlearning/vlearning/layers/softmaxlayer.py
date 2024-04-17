@@ -89,6 +89,15 @@ class SoftmaxLayer(Layer):
 
         # Calculate the gradient of the loss to the pre-activation values
         new_gradients: list[list[float]] = []
+        for y_hat, gradient in zip(y_hats, gradients):
+            instance_gradients = [
+                sum(
+                    gradient[o] * y_hat[o] * ((i == o) - y_hat[i])
+                    for o in range(self.num_outputs)
+                )
+                for i in range(self.num_inputs)
+            ]
+            new_gradients.append(instance_gradients)
 
         return y_hats, losses, new_gradients
 
