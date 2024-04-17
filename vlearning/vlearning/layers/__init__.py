@@ -15,19 +15,21 @@ respective modules they are defined in.
 Classes:
     Layer: The base implementation of a layer for a neural network.
     InputLayer: The first layer of a neural network.
-    DenseLayer: A layer representing a dense layer of a neural network.
-    ActivationLayer: A layer representing an activation function in a neural network.
+    DenseLayer: The first of two layer representing a hidden layer of a neural network.
+    ActivationLayer: The second layer class of a hidden layer in a neural network.
+    SoftmaxLayer: Applies softmax activation function to the neural network's outputs.
     LossLayer: A layer representing a loss function in a neural network.
 
 Typical usage example:
-    from vlearning import activation_functions
+    from vlearning import activation_functions, layers
 
     my_network = (
-        InputLayer(2, name='Input') +
-        DenseLayer(5, name='Dense') +
-        ActivationLayer(5, activation=activation_functions.tanh, name='Activation') +
-        DenseLayer(1, name='Output') +
-        LossLayer(name='Loss') +
+        layers.InputLayer(2) +
+        layers.DenseLayer(5, name='Hidden') +
+        layers.ActivationLayer(5, activation=activation_functions.tanh) +
+        layers.DenseLayer(4, name='Output') +
+        layers.SoftmaxLayer() +
+        layers.LossLayer()
     )
     my_network.fit(xs, ys, alpha=0.1, epochs=200)
     y_hats = my_network.predict(xs)
@@ -36,6 +38,7 @@ from .layer import Layer
 from .inputlayer import InputLayer
 from .denselayer import DenseLayer
 from .activationlayer import ActivationLayer
+from .softmaxlayer import SoftmaxLayer
 from .losslayer import LossLayer
 
 __all__ = [
@@ -43,5 +46,6 @@ __all__ = [
     "InputLayer",
     "DenseLayer",
     "ActivationLayer",
+    "SoftmaxLayer",
     "LossLayer",
 ]
