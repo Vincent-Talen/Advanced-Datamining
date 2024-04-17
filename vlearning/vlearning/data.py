@@ -1,16 +1,16 @@
 # Note: no changes need to be made to this file...
 
 # IMPORTS:
-
 import matplotlib.pyplot as plt
 import numpy as np
 import warnings, random
-from math import pi, cos, sin, sqrt, floor, ceil, atan2, copysign
+from matplotlib.colors import LogNorm
+from math import pi, cos, sin, sqrt, floor, ceil, copysign
 from cmath import phase
+from sklearn import metrics
 
 
 # FUNCTIONS:
-
 def linear(outcome, *, num=100, dim=2, noise=0.0, seed=None):
     """Generate a linear dataset with attributes and outcomes.
 
@@ -145,6 +145,69 @@ def fractal(classes, *, num=200, seed=None):
     return xs, ys
 
 
+def concentric(*, num=200, dim=2, noise=0.0, density=2.5, seed=None):
+    """Generate a concentric-circles dataset with attributes and outcomes.
+
+    Keyword options:
+    num      -- number of instances (default 200)
+    dim      -- dimensionality of the attributes (default 2)
+    noise    -- the amount of noise to add (default 0.0)
+    density  -- the relative density of the circles (default 2.5)
+    seed     -- a seed to initialise the random numbers (default random)
+
+    Return values:
+    xs       -- values of the attributes
+    ys       -- values of the outcomes
+    """
+    # Seed the random number generator
+    random.seed(seed)
+    # Generate attribute data
+    xs = [[random.random()*3.0 - 1.5 for d in range(dim)] for n in range(num)]
+    # Generate outcomes
+    ys = [[sin(density * (x[0]*x[0] + x[1] * x[1]))] for x in xs]
+    # Add noise to the attributes
+    for n in range(num):
+        for d in range(dim):
+            xs[n][d] += random.uniform(-noise, noise)
+    # Return values
+    return xs, ys
+
+
+def sign_mnist_mini(filename, num=33600, seed=None):
+    """Returns a number of different random 12x12 Sign-MNIST images.
+
+    Keyword arguments:
+    filename -- full filename of the *.dat datafile
+    num      -- number of images to randomly select (default 33600)
+    seed     -- a seed to initialise the random number generator (default random)
+
+    Return values:
+    xs       -- 144-element lists of pixel values (range 0.0-1.0)
+    ys       -- 24-element lists of correct gestures using one-hot encoding
+    """
+    # Seed the random number generator
+    random.seed(seed)
+    # Initialise
+    xs = list()
+    ys = list()
+    y = [0]*23 + [1]
+    # Pick the digits
+    with open(filename, 'rb') as datafile:
+        for n in random.sample(range(1400), (num+23) // 24):
+            datafile.seek(n*72*24)
+            for m in range(24):
+                x = list()
+                for byte in datafile.read(72):
+                    x.append((byte // 16 + random.random()) / 16.0)
+                    x.append((byte % 16 + random.random()) / 16.0)
+                y = y[23:] + y[:23]
+                xs.append(x)
+                ys.append(y)
+    # Shuffle and return
+    permutation = random.sample(range(len(xs)), num)
+    return [xs[i] for i in permutation], [ys[i] for i in permutation]
+
+
 def scatter(xs, ys, *, model=None):
     """Plots data according to true and modeled outcomes.
 
@@ -275,6 +338,78 @@ def curve(series):
     plt.axhline(y=0, color='k', linestyle='-', linewidth=1.0)
     plt.xlabel(r'$n$')
     plt.ylabel(r'$y$')
+    plt.show()
+
+
+def gestures(xs, ys, model=None):
+    """Shows 12x12 Sign-MNIST letter gestures with true (and predicted) labels.
+
+    Keyword arguments:
+    xs       -- 144-element lists of pixel values (range 0-1)
+    ys       -- 24-element lists of correct gestures using one-hot encoding
+    model    -- the classification model (default None)
+
+    Return values:
+    None
+    """
+    # Define the argmax helper function
+    def argmax(ls):
+        m = -1.0
+        result = -1
+        for n, l in enumerate(ls):
+            if l > m:
+                m = l
+                result = n
+        return result
+    # Plot the gestures
+    labels = 'ABCDEFGHIKLMNOPQRSTUVWXY'
+    axes = len(xs)
+    fig, axs = plt.subplots(1, axes, figsize=(0.8*axes, 0.8), squeeze=False)
+    for n, ax in enumerate(axs[0]):
+        paint = [[xs[n][xi*12+yi] for xi in range(12)] for yi in range(12)]
+        ax.imshow(paint, extent=(0.0, 1.0, 0.0, 1.0), vmin=0.0, vmax=1.0, cmap=plt.cm.binary)
+        ax.set_aspect('equal', 'box')
+        ax.axis('off')
+        t = labels[argmax(ys[n])]
+        if model is not None:
+            t += '→' + labels[argmax(model.predict([xs[n]])[0])]
+        ax.set_title(t)
+    plt.show()
+
+
+def confusion(xs, ys, model):
+    """Shows 24x24 confusion matrix.
+
+    Keyword arguments:
+    xs       -- 144-element lists of pixel values (range 0-1)
+    ys       -- 24-element lists of correct gestures using one-hot encoding
+    model    -- the classification model
+
+    Return values:
+    None
+    """
+    # Define the argmax helper function
+    def argmax(ls):
+        m = -1.0
+        result = -1
+        for n, l in enumerate(ls):
+            if l > m:
+                m = l
+                result = n
+        return result
+    # Compute the confusion matrix
+    yhats = model.predict(xs)
+    matrix = metrics.confusion_matrix([argmax(y) for y in ys], [argmax(yhat) for yhat in yhats], labels=list(range(24)))
+    accuracy = sum(matrix[i][i] for i in range(24)) / len(xs)
+    # Plot the confusion matrix
+    plt.imshow(matrix, norm=LogNorm(), cmap='Blues', origin='lower')
+    plt.grid(True)
+    plt.title(f'Accuracy = {accuracy*100.0:.1f}%')
+    plt.xlabel('$\hat{y}$')
+    plt.ylabel('$y$')
+    plt.xticks(range(24), list('ABCDEFGHIKLMNOPQRSTUVWXY'))
+    plt.yticks(range(24), list('ABCDEFGHIKLMNOPQRSTUVWXY'))
+    plt.colorbar()
     plt.show()
 
 
