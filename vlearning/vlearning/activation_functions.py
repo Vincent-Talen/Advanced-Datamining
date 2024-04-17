@@ -4,11 +4,24 @@ Available activation functions:
     - linear
     - sign
     - tanh
+    - softsign
+    - sigmoid
+    - softplus
+    - relu
+    - swish
 """
-from math import tanh as math_tanh
-# from math import e as math_e, tanh as math_tanh
+from math import tanh as math_tanh, exp, log1p
 
-__all__ = ["linear", "sign", "tanh"]
+__all__ = [
+    "linear",
+    "sign",
+    "tanh",
+    "softsign",
+    "sigmoid",
+    "softplus",
+    "relu",
+    "swish",
+]
 
 
 def linear(a: float) -> float:
@@ -48,8 +61,8 @@ def tanh(a: float) -> float:
     Returns:
         The calculated post-activation value.
     """
-    # e_a = math_e ** a
-    # e_neg_a = math_e ** -a
+    # e_a = exp(a)
+    # e_neg_a = exp(-a)
     # return (e_a - e_neg_a) / (e_a + e_neg_a)
     return math_tanh(a)
 
@@ -64,3 +77,59 @@ def softsign(a: float) -> float:
         The calculated post-activation value.
     """
     return a / (1 + abs(a))
+
+
+def sigmoid(a: float) -> float:
+    """Sigmoid Activation Function
+
+    Args:
+        a: Pre-activation value.
+
+    Returns:
+        The calculated post-activation value.
+    """
+    # Normal logistic sigmoid function
+    if a >= 0:
+        return 1 / (1 + exp(-a))
+    # Equivalent formula to avoid overflow
+    e_a = exp(a)
+    return e_a / (1 + e_a)
+
+
+def softplus(a: float) -> float:
+    """Softplus Activation Function
+
+    Args:
+        a: Pre-activation value.
+
+    Returns:
+        The calculated post-activation value.
+    """
+    return log1p(exp(-abs(a))) + max(a, 0)
+
+
+def relu(a: float) -> float:
+    """Rectified Linear Unit (ReLU) Function
+
+    Args:
+        a: Pre-activation value.
+
+    Returns:
+        The calculated post-activation value.
+    """
+    return max(0.0, a)
+
+
+def swish(a: float, *, beta: float = 1) -> float:
+    """Sigmoid-weighted Linear Unit (swish) Activation Function
+
+    Args:
+        a: Pre-activation value.
+
+    Keyword Args:
+        beta: The beta parameter for the swish function.
+
+    Returns:
+        The calculated post-activation value.
+    """
+    return a * sigmoid(beta * a)
