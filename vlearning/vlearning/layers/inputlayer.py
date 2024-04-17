@@ -4,6 +4,8 @@ An InputLayer is a special type of layer that is the first layer in a network an
 the only layer instance you actually interact with when using the network. Meaning
 it is the only layer that you can call the `predict` and `fit` methods on.
 """
+from random import shuffle
+
 from overrides import override
 
 from vlearning.layers import Layer
@@ -89,6 +91,7 @@ class InputLayer(Layer):
         *,
         alpha: float = 0.001,
         validation_data: tuple[list[list[float]], list[list[float]]] = None,
+        batch_size: int = None,
     ) -> None:
         """Fit/train the network to the given dataset for a single epoch.
 
@@ -96,7 +99,8 @@ class InputLayer(Layer):
         in the `training_history` instance attribute. If the `validation_data` argument
         is provided, the network will be evaluated on this data after each epoch and the
         validation loss will be stored in the `training_history` under the
-        `validation_loss` key.
+        `validation_loss` key. If the `batch_size` argument is provided, the network
+        will update weights and biases multiple times per epoch, thus converging faster.
 
         Args:
             xs:
@@ -111,9 +115,23 @@ class InputLayer(Layer):
             validation_data:
                 A tuple containing two lists, the first being the validation data itself
                 and the second the expected/actual labels for the validation instances.
+            batch_size:
+                The number of instances to train the network on before updating the
+                weights. If not provided, the network will be trained on all instances.
         """
-        _, losses, _ = self(xs, labels, alpha=alpha)
-        self.training_history["loss"].append(sum(losses) / len(losses))
+        num_instances = len(xs)
+        batch_size = batch_size or num_instances
+
+        epoch_losses = []
+        for i in range(0, num_instances, batch_size):
+            batch_instances = xs[i:i + batch_size]
+            batch_labels = labels[i:i + batch_size]
+            _, batch_losses, _ = self(batch_instances, batch_labels, alpha=alpha)
+            epoch_losses.extend(batch_losses)
+
+        epoch_mean_loss = sum(epoch_losses) / num_instances
+        self.training_history["loss"].append(epoch_mean_loss)
+
         if validation_data:
             validation_loss = self.evaluate(*validation_data)
             self.training_history["validation_loss"].append(validation_loss)
@@ -126,12 +144,15 @@ class InputLayer(Layer):
         alpha: float = 0.001,
         epochs: int = 100,
         validation_data: tuple[list[list[float]], list[list[float]]] = None,
+        batch_size: int = None,
     ) -> dict[str, list[float]]:
         """Fit/train the network to the given dataset for a given number of epochs.
 
         If the `validation_data` argument is provided, the network will be evaluated
         on this data after each epoch and the validation loss will be stored in the
-        `training_history` under the `validation_loss` key.
+        `training_history` dictionary attribute under the `validation_loss` key. To
+        improve the training process when batch learning, all instances' data and labels
+        are shuffled before each epoch.
 
         Args:
             xs:
@@ -148,6 +169,9 @@ class InputLayer(Layer):
             validation_data:
                 A tuple containing two lists, the first being the validation data itself
                 and the second the expected/actual labels for the validation instances.
+            batch_size:
+                The number of instances to train the network on before updating the
+                weights. If not provided, the network will be trained on all instances.
 
         Returns:
             A dictionary containing the training history of the network.
@@ -156,6 +180,18 @@ class InputLayer(Layer):
             self.training_history.setdefault("validation_loss", [])
 
         for _ in range(epochs):
-            self.partial_fit(xs, labels, alpha=alpha, validation_data=validation_data)
+            # Shuffle the data and labels before each epoch by pairing them with zip
+            paired_lists = list(zip(xs, labels))
+            shuffle(paired_lists)
+            xs_shuffled, labels_shuffled = zip(*paired_lists)
+
+            # Train the network for a single epoch
+            self.partial_fit(
+                xs_shuffled,
+                labels_shuffled,
+                alpha=alpha,
+                validation_data=validation_data,
+                batch_size=batch_size
+            )
 
         return self.training_history

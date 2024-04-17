@@ -20,7 +20,7 @@ def derivative(function: Callable, *, delta: float = 0.01) -> Callable:
         function: The function for which the derivative function needs to be made.
 
     Keyword Args:
-        delta: The step size slope is calculated for.
+        delta: The step size the slope is calculated for.
 
     Returns:
         Numerical derivative function of the input function.
