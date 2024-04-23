@@ -150,8 +150,6 @@ def nipuna(a: float, *, beta: float = 1.0) -> float:
         The calculated post-activation value.
     """
     if a >= 0:
-        x = a / (1 + exp(-beta * a))
-    else:
-        exp_beta_a = exp(beta * a)
-        x = a * exp_beta_a / (1 + exp_beta_a)
-    return max(x, a)
+        return a
+    exp_beta_a = exp(beta * a)
+    return a * exp_beta_a / (1 + exp_beta_a)
