@@ -109,21 +109,23 @@ class DenseLayer(Layer):
         if not alpha:
             return y_hats, losses, None
 
-        scaled_alpha: float = alpha / len(xs)
+        # Calculate the gradients of this layer's output to the input it received
         new_gradients: list[list[float]] = []
-        for x, gradient in zip(xs, gradients):
-            # Calculate the new gradients for this instance
+        for gradient in gradients:
             instance_gradients: list[float] = [
                 sum(self.weights[o][i] * gradient[o] for o in range(self.num_outputs))
                 for i in range(self.num_inputs)
             ]
             new_gradients.append(instance_gradients)
 
-            # Update the weights and biases
+        # Update the weights and biases based on the gradients
+        scaled_alpha: float = alpha / len(xs)
+        for x, gradient in zip(xs, gradients):
             for o in range(self.num_outputs):
-                self.biases[o] -= scaled_alpha * gradient[o]
+                update_size: float = scaled_alpha * gradient[o]
+                self.biases[o] -= update_size
                 for i in range(self.num_inputs):
-                    self.weights[o][i] -= scaled_alpha * gradient[o] * x[i]
+                    self.weights[o][i] -= update_size * x[i]
 
         return y_hats, losses, new_gradients
 
