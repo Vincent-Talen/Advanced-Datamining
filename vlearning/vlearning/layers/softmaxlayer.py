@@ -61,7 +61,8 @@ class SoftmaxLayer(Layer):
         y_hats: list[list[float]] = []
         for instance_vector in linear_outputs:
             # Calculate the exponential of each output value and their sum
-            euler_vector = [exp(x - max(instance_vector)) for x in instance_vector]
+            max_value = max(instance_vector)
+            euler_vector = [exp(x - max_value) for x in instance_vector]
             euler_output_sum = sum(euler_vector)
             # Divide each exponential by the sum to get the probabilities
             y_hats.append([value / euler_output_sum for value in euler_vector])
