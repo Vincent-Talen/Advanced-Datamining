@@ -7,6 +7,7 @@ it is the only layer that you can call the `predict` and `fit` methods on.
 from random import shuffle
 
 from overrides import override
+from tqdm import trange
 
 from vlearning.layers import Layer
 
@@ -179,7 +180,7 @@ class InputLayer(Layer):
         if validation_data:
             self.training_history.setdefault("validation_loss", [])
 
-        for _ in range(epochs):
+        for _ in trange(epochs, desc="Epochs trained", unit="epoch", ncols=128):
             # Shuffle the data and labels before each epoch by pairing them with zip
             paired_lists = list(zip(xs, labels))
             shuffle(paired_lists)
