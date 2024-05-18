@@ -10,7 +10,7 @@ Typical usage example:
 from collections.abc import Callable
 
 
-def derivative(function: Callable, *, delta: float = 0.01) -> Callable:
+def derivative(function: Callable, *, delta: float = 0.001) -> Callable:
     """Creates a numerical derivative function for the given input function.
 
     The resulting numerical derivative function is able to calculate a

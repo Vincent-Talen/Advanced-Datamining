@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vlearning"
-version = "0.6.0"
+version = "0.6.1"
 description = "Machine Learning package for the Bioinformatics course Advanced Datamining"
 authors = ["VincentTalen <v.k.talen@st.hanze.nl>"]
 readme = "README.md"
@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
 overrides = "^7.7.0"
+tqdm = "^4.66.2"
 
 
 [build-system]
