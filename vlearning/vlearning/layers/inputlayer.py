@@ -120,17 +120,20 @@ class InputLayer(Layer):
                 The number of instances to train the network on before updating the
                 weights. If not provided, the network will be trained on all instances.
         """
+        if validation_data:
+            self.training_history.setdefault("validation_loss", [])
+
         num_instances = len(xs)
         batch_size = batch_size or num_instances
 
-        epoch_losses = []
+        total_epoch_loss = 0
         for i in range(0, num_instances, batch_size):
             batch_instances = xs[i:i + batch_size]
             batch_labels = labels[i:i + batch_size]
             _, batch_losses, _ = self(batch_instances, batch_labels, alpha=alpha)
-            epoch_losses.extend(batch_losses)
+            total_epoch_loss += sum(batch_losses)
 
-        epoch_mean_loss = sum(epoch_losses) / num_instances
+        epoch_mean_loss = total_epoch_loss / num_instances
         self.training_history["loss"].append(epoch_mean_loss)
 
         if validation_data:
@@ -143,9 +146,9 @@ class InputLayer(Layer):
         labels: list[list[float]] = None,
         *,
         alpha: float = 0.001,
+        batch_size: int = None,
         epochs: int = 100,
         validation_data: tuple[list[list[float]], list[list[float]]] = None,
-        batch_size: int = None,
     ) -> dict[str, list[float]]:
         """Fit/train the network to the given dataset for a given number of epochs.
 
@@ -165,21 +168,18 @@ class InputLayer(Layer):
         Keyword Args:
             alpha:
                 The learning rate of the network.
+            batch_size:
+                The number of instances to train the network on before updating the
+                weights. If not provided, the network will be trained on all instances.
             epochs:
                 The number of epochs to train the network for.
             validation_data:
                 A tuple containing two lists, the first being the validation data itself
                 and the second the expected/actual labels for the validation instances.
-            batch_size:
-                The number of instances to train the network on before updating the
-                weights. If not provided, the network will be trained on all instances.
 
         Returns:
             A dictionary containing the training history of the network.
         """
-        if validation_data:
-            self.training_history.setdefault("validation_loss", [])
-
         for _ in trange(epochs, desc="Epochs trained", unit="epoch", ncols=128):
             # Shuffle the data and labels before each epoch by pairing them with zip
             paired_lists = list(zip(xs, labels))
@@ -191,8 +191,8 @@ class InputLayer(Layer):
                 xs_shuffled,
                 labels_shuffled,
                 alpha=alpha,
+                batch_size=batch_size,
                 validation_data=validation_data,
-                batch_size=batch_size
             )
 
         return self.training_history
