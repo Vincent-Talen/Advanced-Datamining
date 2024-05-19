@@ -6,6 +6,7 @@ pre-activation values, after which it is normally combined with an ActivationLay
 applies its activation function to create the post-activation value.
 """
 import random
+from copy import deepcopy
 from math import sqrt
 
 from overrides import override
@@ -96,10 +97,14 @@ class DenseLayer(Layer):
             gradient of the loss to the input it receives from the layer before, for
             every feature (neuron of current layer) of that instance.
         """
+        # Copy the layer's weights+biases to not have to access them through self
+        new_weights: list[list[float]] = deepcopy(self.weights)
+        new_biases: list[float] = deepcopy(self.biases)
+
         linear_outputs: list[list[float]] = []
         for x in xs:
             a = [
-                self.biases[o] + sum(wi * xi for wi, xi in zip(self.weights[o], x))
+                new_biases[o] + sum(wi * xi for wi, xi in zip(new_weights[o], x))
                 for o in range(self.num_outputs)
             ]
             linear_outputs.append(a)
@@ -113,7 +118,7 @@ class DenseLayer(Layer):
         new_gradients: list[list[float]] = []
         for gradient in gradients:
             instance_gradients: list[float] = [
-                sum(self.weights[o][i] * gradient[o] for o in range(self.num_outputs))
+                sum(new_weights[o][i] * gradient[o] for o in range(self.num_outputs))
                 for i in range(self.num_inputs)
             ]
             new_gradients.append(instance_gradients)
@@ -123,10 +128,13 @@ class DenseLayer(Layer):
         for x, gradient in zip(xs, gradients):
             for o in range(self.num_outputs):
                 update_size: float = scaled_alpha * gradient[o]
-                self.biases[o] -= update_size
+                new_biases[o] -= update_size
                 for i in range(self.num_inputs):
-                    self.weights[o][i] -= update_size * x[i]
+                    new_weights[o][i] -= update_size * x[i]
 
+        # Update the weights and biases
+        self.weights = new_weights
+        self.biases = new_biases
         return y_hats, losses, new_gradients
 
     @override
