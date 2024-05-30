@@ -8,8 +8,7 @@ applies its activation function to create the post-activation value.
 import random
 from copy import deepcopy
 from math import sqrt
-
-from overrides import override
+from typing import override
 
 from vlearning.layers import Layer
 
