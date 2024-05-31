@@ -1,4 +1,5 @@
 # Note: no changes need to be made to this file...
+from string import ascii_uppercase
 
 # IMPORTS:
 import matplotlib.pyplot as plt
@@ -208,7 +209,42 @@ def sign_mnist_mini(filename, num=33600, seed=None):
     return [xs[i] for i in permutation], [ys[i] for i in permutation]
 
 
-def scatter(xs, ys, *, model=None):
+def emnist_mini(filename, num=52000, seed=None):
+    """Returns a number of different random 12x12 EMNIST images.
+
+    Keyword arguments:
+    filename -- full filename of the *.dat datafile
+    num      -- number of images to randomly select (default 52000)
+    seed     -- a seed to initialise the random number generator (default random)
+
+    Return values:
+    xs       -- 144-element lists of pixel values (range 0.0-1.0)
+    ys       -- 26-element lists of correct letters using one-hot encoding
+    """
+    # Seed the random number generator
+    random.seed(seed)
+    # Initialise
+    xs = list()
+    ys = list()
+    y = [0]*25 + [1]
+    # Pick the digits
+    with open(filename, 'rb') as datafile:
+        for n in random.sample(range(2000), (num+25) // 26):
+            datafile.seek(n*72*26)
+            for m in range(26):
+                x = list()
+                for byte in datafile.read(72):
+                    x.append((byte // 16 + random.random()) / 16.0)
+                    x.append((byte % 16 + random.random()) / 16.0)
+                y = y[25:] + y[:25]
+                xs.append(x)
+                ys.append(y)
+    # Shuffle and return
+    permutation = random.sample(range(len(xs)), num)
+    return [xs[i] for i in permutation], [ys[i] for i in permutation]
+
+
+def scatter(xs, ys, *, model=None, colorbar_line_y=0.0):
     """Plots data according to true and modeled outcomes.
 
     Arguments:
@@ -270,7 +306,7 @@ def scatter(xs, ys, *, model=None):
         ax.set_xlabel(r'$x_1$')
         ax.set_ylabel(r'$x_2$')
         cbar = plt.colorbar(data, ax=ax).ax
-        cbar.axhline(y=0.0, color='k', linestyle='--', linewidth=1.0)
+        cbar.axhline(y=colorbar_line_y, color='k', linestyle='--', linewidth=1.0)
         cbar.set_title(r'$y$' if axes == 1 else r'$y_{}$'.format(n+1))
     plt.show()
 
@@ -377,13 +413,13 @@ def gestures(xs, ys, model=None):
     plt.show()
 
 
-def confusion(xs, ys, model):
-    """Shows 24x24 confusion matrix.
+def letters(xs, ys, model=None):
+    """Shows 12x12 EMNIST letter images with true (and predicted) labels.
 
     Keyword arguments:
     xs       -- 144-element lists of pixel values (range 0-1)
-    ys       -- 24-element lists of correct gestures using one-hot encoding
-    model    -- the classification model
+    ys       -- 26-element lists of correct letters using one-hot encoding
+    model    -- the classification model (default None)
 
     Return values:
     None
@@ -397,18 +433,57 @@ def confusion(xs, ys, model):
                 m = l
                 result = n
         return result
+    # Plot the letters
+    axes = len(xs)
+    fig, axs = plt.subplots(1, axes, figsize=(0.8*axes, 0.8), squeeze=False)
+    for n, ax in enumerate(axs[0]):
+        paint = [[xs[n][xi+yi*12] for xi in range(12)] for yi in range(12)]
+        ax.imshow(paint, extent=(0.0, 1.0, 0.0, 1.0), vmin=0.0, vmax=1.0, cmap=plt.cm.binary)
+        ax.set_aspect('equal', 'box')
+        ax.axis('off')
+        t = '{:s}'.format(chr(argmax(ys[n])+65))
+        if model is not None:
+            t += '→{:s}'.format(chr(argmax(model.predict([xs[n]])[0])+65))
+        ax.set_title(t)
+    plt.show()
+
+
+def confusion(xs, ys, model, *, excluded_letters=None):
+    """Shows a confusion matrix for the alphabet minus the excluded letters.
+
+    Keyword arguments:
+    xs       -- 144-element lists of pixel values (range 0-1)
+    ys       -- lists with the correct one-hot encoding classifications
+    model    -- the classification model
+
+    Return values:
+    None
+    """
+    excluded_letters = excluded_letters or []
+    used_letters = [s for s in ascii_uppercase if s not in excluded_letters]
+    size = len(used_letters)
+
+    # Define the argmax helper function
+    def argmax(ls):
+        m = -1.0
+        result = -1
+        for n, l in enumerate(ls):
+            if l > m:
+                m = l
+                result = n
+        return result
     # Compute the confusion matrix
     yhats = model.predict(xs)
-    matrix = metrics.confusion_matrix([argmax(y) for y in ys], [argmax(yhat) for yhat in yhats], labels=list(range(24)))
-    accuracy = sum(matrix[i][i] for i in range(24)) / len(xs)
+    matrix = metrics.confusion_matrix([argmax(y) for y in ys], [argmax(yhat) for yhat in yhats], labels=list(range(size)))
+    accuracy = sum(matrix[i][i] for i in range(size)) / len(xs)
     # Plot the confusion matrix
     plt.imshow(matrix, norm=LogNorm(), cmap='Blues', origin='lower')
     plt.grid(True)
     plt.title(f'Accuracy = {accuracy*100.0:.1f}%')
-    plt.xlabel('$\hat{y}$')
+    plt.xlabel(r'$\hat{y}$')
     plt.ylabel('$y$')
-    plt.xticks(range(24), list('ABCDEFGHIKLMNOPQRSTUVWXY'))
-    plt.yticks(range(24), list('ABCDEFGHIKLMNOPQRSTUVWXY'))
+    plt.xticks(range(size), used_letters)
+    plt.yticks(range(size), used_letters)
     plt.colorbar()
     plt.show()
 
