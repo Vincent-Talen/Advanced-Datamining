@@ -364,12 +364,16 @@ def curve(series):
     for n, label in enumerate(sorted(series.keys())):
         data = series[label]
         xmax = max(xmax, len(data))
-        plt.plot([x + 0.5 for x in range(len(data))], data, color=colors[n % len(colors)], linewidth=3.0, label=label)
+        plt.plot([x + 1 for x in range(len(data))], data, color=colors[n % len(colors)], linewidth=3.0, label=label)
         plt.axhline(y=min(data), color=colors[n % len(colors)], linewidth=1.0, linestyle='--')
         plt.axhline(y=max(data), color=colors[n % len(colors)], linewidth=1.0, linestyle='--')
+        if label == "validation_loss":
+            plt.axvline(x=data.index(min(data)) + 1, color=colors[n % len(colors)], linewidth=1.0, linestyle=':')
     # Finish the layout
-    plt.xlim([0, xmax])
-    plt.legend()
+    plt.xlim([0.5, xmax + 0.5])
+    plt.ylim([0.0, max(ceil(max(series[label])) for label in series.keys())])
+    plt.legend(loc="upper right")
+    plt.xticks(range(1, xmax + 1, 1 if xmax <= 10 else 2))
     plt.grid(True, color='k', linestyle=':', linewidth=0.5)
     plt.axhline(y=0, color='k', linestyle='-', linewidth=1.0)
     plt.xlabel(r'$n$')
