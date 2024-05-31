@@ -97,16 +97,16 @@ class DenseLayer(Layer):
             every feature (neuron of current layer) of that instance.
         """
         # Copy the layer's weights+biases to not have to access them through self
-        new_weights: list[list[float]] = deepcopy(self.weights)
-        new_biases: list[float] = deepcopy(self.biases)
+        local_weights: list[list[float]] = deepcopy(self.weights)
+        local_biases: list[float] = deepcopy(self.biases)
 
-        linear_outputs: list[list[float]] = []
-        for x in xs:
-            a = [
-                new_biases[o] + sum(wi * xi for wi, xi in zip(new_weights[o], x))
+        linear_outputs: list[list[float]] = [
+            [
+                local_biases[o] + sum(wi * xi for wi, xi in zip(local_weights[o], x))
                 for o in range(self.num_outputs)
             ]
-            linear_outputs.append(a)
+            for x in xs
+        ]
 
         # Feed forward and receive the next layer's results and back-propagation values
         y_hats, losses, gradients = self.next_layer(linear_outputs, labels, alpha=alpha)
@@ -114,26 +114,26 @@ class DenseLayer(Layer):
             return y_hats, losses, None
 
         # Calculate the gradients of this layer's output to the input it received
-        new_gradients: list[list[float]] = []
-        for gradient in gradients:
-            instance_gradients: list[float] = [
-                sum(new_weights[o][i] * gradient[o] for o in range(self.num_outputs))
+        new_gradients: list[list[float]] = [
+            [
+                sum(local_weights[o][i] * gradient[o] for o in range(self.num_outputs))
                 for i in range(self.num_inputs)
             ]
-            new_gradients.append(instance_gradients)
+            for gradient in gradients
+        ]
 
         # Update the weights and biases based on the gradients
         scaled_alpha: float = alpha / len(xs)
         for x, gradient in zip(xs, gradients):
             for o in range(self.num_outputs):
                 update_size: float = scaled_alpha * gradient[o]
-                new_biases[o] -= update_size
+                local_biases[o] -= update_size
                 for i in range(self.num_inputs):
-                    new_weights[o][i] -= update_size * x[i]
+                    local_weights[o][i] -= update_size * x[i]
 
         # Update the weights and biases
-        self.weights = new_weights
-        self.biases = new_biases
+        self.weights = local_weights
+        self.biases = local_biases
         return y_hats, losses, new_gradients
 
     @override
