@@ -26,6 +26,7 @@ import importlib.metadata
 __version__ = importlib.metadata.version(__package__ or __name__)
 
 # Imports to make some functions and Classes, located within modules, directly available
+from vlearning.epochtracker import EpochTracker
 from vlearning.derivative import derivative
 from vlearning.pseudo_log import pseudo_log
 from vlearning.neuron import Neuron
@@ -43,6 +44,7 @@ __all__ = [
     "Perceptron",
     "Neuron",
     "LinearRegression",
+    "EpochTracker",
     # Modules
     "activation_functions",
     "loss_functions",

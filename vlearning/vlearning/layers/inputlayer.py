@@ -7,8 +7,8 @@ it is the only layer that you can call the `predict` and `fit` methods on.
 from random import shuffle
 
 from overrides import override
-from tqdm import trange
 
+from vlearning import EpochTracker
 from vlearning.layers import Layer
 
 
@@ -180,7 +180,7 @@ class InputLayer(Layer):
         Returns:
             A dictionary containing the training history of the network.
         """
-        for _ in trange(epochs, desc="Epochs trained", unit="epoch", ncols=128):
+        for _ in EpochTracker(epochs, n_cols=128):
             # Shuffle the data and labels before each epoch by pairing them with zip
             paired_lists = list(zip(xs, labels))
             shuffle(paired_lists)
