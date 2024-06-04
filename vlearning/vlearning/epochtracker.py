@@ -68,14 +68,14 @@ class EpochTracker:
             A string with UTF symbols representing the progress bar.
         """
         # Get characters with different thicknesses to use for the progress bar
-        charset = u" " + u"".join(map(chr, range(0x258F, 0x2587, -1)))
+        charset = " " + "".join(map(chr, range(0x258F, 0x2587, -1)))
         nsyms = len(charset) - 1
         # Get the amount of full and fractional symbols to use
         bar_len, frac_bar_len = divmod(int(fraction * bar_max_len * nsyms), nsyms)
-        bar = charset[-1] * bar_len
+        progress = charset[-1] * bar_len
         if bar_len < bar_max_len:  # whitespace padding
-            bar += charset[frac_bar_len] + charset[0] * (bar_max_len - bar_len - 1)
-        return bar
+            progress += charset[frac_bar_len] + charset[0] * (bar_max_len - bar_len - 1)
+        return progress
 
     def _refresh(self, n: int, elapsed_time: float) -> None:
         """Refreshes the progress bar to the given epoch and elapsed time.
@@ -105,8 +105,10 @@ class EpochTracker:
         postfix = f"| {n_elapsed_str} [{t_elapsed_str}<{t_remaining_str}, {rate_str}]"
 
         # Create the progress bar and display it including all other information
-        bar_max_len = max(1, self.n_cols - len(prefix) - len(postfix))
-        progress_bar = self._create_progress_bar(bar_max_len, fraction)
+        progress_bar = self._create_progress_bar(
+            bar_max_len=max(1, self.n_cols - len(prefix) - len(postfix)),
+            fraction=fraction,
+        )
         print(f"\r{prefix}{progress_bar}{postfix}", end="", flush=True)
 
     def update(self, epoch: int) -> None:
