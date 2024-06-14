@@ -9,6 +9,8 @@ neural networks and deep learning. The way the neural networks are structured as
 is done to follow the design specifications of the course, and the implementation is
 based on the mathematical concepts taught in the course.
 
+GitHub Repository for the Advanced Datamining course: https://github.com/Vincent-Talen/Advanced-Datamining
+
 ---
 ## Differences between the usage of the `vlearning` package and the `model.py` module
 The main difference is that importing is different in the beginning of the notebooks and the accessing of the classes/functions available, which is explained in the first section.
