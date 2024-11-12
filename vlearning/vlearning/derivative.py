@@ -30,4 +30,5 @@ def derivative(function: Callable, *, delta: float = 0.001) -> Callable:
 
     wrapper_derivative.__name__ = f"{function.__name__}’"
     wrapper_derivative.__qualname__ = f"{function.__qualname__}’"
+    wrapper_derivative.__doc__ = f"Numerical derivative of {function.__name__}."
     return wrapper_derivative
